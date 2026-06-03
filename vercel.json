@@ -1,0 +1,16 @@
+{
+  "crons": [
+    {
+      "path": "/api/queue-stories",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/deliver-stories",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/health-digest",
+      "schedule": "0 8 * * 1"
+    }
+  ]
+}

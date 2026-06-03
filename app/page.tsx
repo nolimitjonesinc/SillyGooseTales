@@ -1,65 +1,94 @@
-import Image from "next/image";
+'use client'
+import Link from 'next/link'
 
-export default function Home() {
+export default function LandingPage() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="min-h-screen bg-[#FDF6EE]">
+      {/* Hero */}
+      <section className="max-w-2xl mx-auto px-6 pt-24 pb-16 text-center">
+        <p className="text-[#E8A838] text-sm font-medium tracking-widest uppercase mb-6">
+          Story Drop
+        </p>
+        <h1 className="text-5xl font-bold text-[#2C2A26] leading-tight mb-6"
+          style={{ fontFamily: 'Georgia, serif' }}>
+          A story. Every week.<br />Just for them.
+        </h1>
+        <p className="text-xl text-[#5a5550] mb-10 leading-relaxed">
+          Personalized bedtime stories delivered to your inbox.
+          Set it once. Let the stories arrive.
+        </p>
+        <Link
+          href="/signup"
+          className="inline-block bg-[#E8A838] text-white text-lg font-semibold px-8 py-4 rounded-xl hover:bg-[#d4952d] transition-colors"
+        >
+          Get your child&apos;s first story free tonight
+        </Link>
+        <p className="text-sm text-[#aaa] mt-4">No credit card. No app. Story arrives in your inbox.</p>
+      </section>
+
+      {/* How it works */}
+      <section className="max-w-2xl mx-auto px-6 py-16 border-t border-[#e8ddd0]">
+        <h2 className="text-2xl font-bold text-[#2C2A26] text-center mb-12"
+          style={{ fontFamily: 'Georgia, serif' }}>
+          Three steps. Then it just works.
+        </h2>
+        <div className="space-y-8">
+          {[
+            { n: '1', title: 'Tell us about your child', body: "Name, age, what they love. Takes two minutes." },
+            { n: '2', title: 'Pick a story vibe and delivery time', body: "Cozy bedtime? Wild adventure? You choose the feel and when it arrives." },
+            { n: '3', title: 'Stories just appear', body: "Every week, a new story written just for them lands in your inbox — ready to read aloud." }
+          ].map(step => (
+            <div key={step.n} className="flex gap-6 items-start">
+              <div className="w-10 h-10 rounded-full bg-[#E8A838] text-white flex items-center justify-center font-bold text-lg flex-shrink-0">
+                {step.n}
+              </div>
+              <div>
+                <h3 className="font-semibold text-[#2C2A26] text-lg mb-1">{step.title}</h3>
+                <p className="text-[#5a5550]">{step.body}</p>
+              </div>
+            </div>
+          ))}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      {/* Pricing */}
+      <section className="max-w-2xl mx-auto px-6 py-16 border-t border-[#e8ddd0]">
+        <h2 className="text-2xl font-bold text-[#2C2A26] text-center mb-10"
+          style={{ fontFamily: 'Georgia, serif' }}>
+          Simple pricing
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white border border-[#e8ddd0] rounded-2xl p-8 text-center">
+            <p className="text-[#5a5550] text-sm mb-2">Monthly</p>
+            <p className="text-4xl font-bold text-[#2C2A26] mb-1">$9.99</p>
+            <p className="text-[#aaa] text-sm mb-6">per month</p>
+            <Link href="/signup?plan=monthly"
+              className="block w-full bg-[#2C2A26] text-white py-3 rounded-xl hover:bg-[#1a1917] transition-colors font-medium">
+              Start monthly
+            </Link>
+          </div>
+          <div className="bg-[#2C2A26] rounded-2xl p-8 text-center relative overflow-hidden">
+            <div className="absolute top-4 right-4 bg-[#E8A838] text-white text-xs font-bold px-3 py-1 rounded-full">
+              SAVE 25%
+            </div>
+            <p className="text-[#aaa] text-sm mb-2">Annual</p>
+            <p className="text-4xl font-bold text-white mb-1">$89.99</p>
+            <p className="text-[#666] text-sm mb-6">$7.50/month · billed once</p>
+            <Link href="/signup?plan=annual"
+              className="block w-full bg-[#E8A838] text-white py-3 rounded-xl hover:bg-[#d4952d] transition-colors font-medium">
+              Start annual
+            </Link>
+          </div>
         </div>
-      </main>
-    </div>
-  );
+        <p className="text-center text-[#aaa] text-sm mt-6">
+          Try free first — no credit card needed.{' '}
+          <Link href="/signup" className="underline text-[#5a5550]">Get one story tonight →</Link>
+        </p>
+      </section>
+
+      <footer className="border-t border-[#e8ddd0] py-8 text-center">
+        <p className="text-[#ccc] text-sm">Story Drop · Made with care for curious kids</p>
+      </footer>
+    </main>
+  )
 }
