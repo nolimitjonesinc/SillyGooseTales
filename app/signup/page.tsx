@@ -87,7 +87,7 @@ function SignupForm() {
             Tonight&apos;s story is on its way.
           </h1>
           <p className="text-[#5a5550] text-lg leading-relaxed">
-            Check your inbox tonight — {childName}&apos;s first story will be there. If you subscribe, a new one lands every week on the day you picked. Each story listens to the last. That&apos;s it. No app, no login, just a great bedtime.
+            Check your inbox tonight — {childName}&apos;s first story will be there. If you subscribe, a new one lands every night. Each story listens to the last. That&apos;s it. No app, no login, just a great bedtime.
           </p>
           <p className="text-[#aaa] text-sm mt-6">
             Check your spam folder if you don&apos;t see it, or add Silly Goose Tales to your contacts.
@@ -111,7 +111,7 @@ function SignupForm() {
             {plan ? `Start ${plan} plan` : 'Let’s write tonight’s story.'}
           </h1>
           <p className="text-[#5a5550]">
-            {plan ? 'Set up your child’s stories in under a minute.' : 'Free story tonight, then one a week after you subscribe. Takes 90 seconds to set up.'}
+            {plan ? ‘Set up your child’s stories in under a minute.’ : ‘Free story tonight, then one every night after you subscribe. Takes 90 seconds to set up.’}
           </p>
         </div>
 

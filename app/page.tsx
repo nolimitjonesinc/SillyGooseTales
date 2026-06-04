@@ -57,7 +57,7 @@ export default function LandingPage() {
 
         {/* Subhead */}
         <p className="text-base text-[#5a5550] mb-8 leading-relaxed">
-          No app. No login. A new personalized story in your inbox every week.
+          No app. No login. A new personalized story in your inbox every night.
         </p>
 
         {/* CTA */}
@@ -143,7 +143,7 @@ export default function LandingPage() {
         >
           Simple pricing
         </h2>
-        <p className="text-center text-[#5a5550] text-xs mb-6">One story every week, on the day you choose.</p>
+        <p className="text-center text-[#5a5550] text-xs mb-6">One new story every night, delivered to your inbox.</p>
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-white border border-[#e8ddd0] rounded-2xl p-6 text-center">
             <p className="text-[#5a5550] text-xs mb-1">Monthly</p>
