@@ -7,7 +7,7 @@ export async function generateMagicToken(subscriberId: string): Promise<string> 
   const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
 
   await supabaseAdmin
-    .from('storydrop_subscribers')
+    .from('sillytales_subscribers')
     .update({ magic_token: token, magic_token_expires_at: expiresAt.toISOString() })
     .eq('id', subscriberId)
 
@@ -17,7 +17,7 @@ export async function generateMagicToken(subscriberId: string): Promise<string> 
 // Validate a magic token and return the subscriber ID
 export async function validateMagicToken(token: string): Promise<string | null> {
   const { data } = await supabaseAdmin
-    .from('storydrop_subscribers')
+    .from('sillytales_subscribers')
     .select('id, magic_token_expires_at')
     .eq('magic_token', token)
     .single()
