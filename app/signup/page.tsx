@@ -12,16 +12,16 @@ const AGE_RANGES = [
 const INTERESTS = [
   'Dinosaurs', 'Space', 'Animals', 'Sports', 'Art',
   'Vehicles', 'Ocean', 'Bugs', 'Castles', 'Robots',
-  'Fairies', 'Nature', 'Cooking', 'Music', 'Something else…'
+  'Fairies', 'Nature', 'Cooking', 'Music', 'Something else...'
 ]
 
 const TONES = [
-  { id: 'cozy_bedtime',   emoji: '🌙', name: 'Cozy Bedtime',     tagline: 'Warm, slow, perfect for drifting off' },
-  { id: 'grand_adventure',emoji: '⚡', name: 'Grand Adventure',   tagline: 'Bold, brave, and moving fast' },
-  { id: 'giggle_factory', emoji: '🤣', name: 'Giggle Factory',    tagline: 'Silly, absurd, laugh-out-loud' },
-  { id: 'brave_heart',    emoji: '💛', name: 'Brave Heart',       tagline: 'Honest — sits with the hard stuff' },
+  { id: 'cozy_bedtime',    emoji: '🌙', name: 'Cozy Bedtime',    tagline: 'Warm, slow, perfect for drifting off' },
+  { id: 'grand_adventure', emoji: '⚡', name: 'Grand Adventure',  tagline: 'Bold, brave, and moving fast' },
+  { id: 'giggle_factory',  emoji: '🤣', name: 'Giggle Factory',   tagline: 'Silly, absurd, laugh-out-loud' },
+  { id: 'brave_heart',     emoji: '💛', name: 'Brave Heart',      tagline: 'Honest — sits with the hard stuff' },
   { id: 'magic_and_wonder',emoji: '✨', name: 'Magic & Wonder',   tagline: 'Hidden magic in ordinary things' },
-  { id: 'laugh_and_learn',emoji: '🔬', name: 'Laugh & Learn',    tagline: 'One real surprising fact in every story' },
+  { id: 'laugh_and_learn', emoji: '🔬', name: 'Laugh & Learn',   tagline: 'One real surprising fact in every story' },
 ]
 
 function SignupForm() {
@@ -40,7 +40,7 @@ function SignupForm() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    const finalInterest = interest === 'Something else…' ? customInterest.trim() : interest
+    const finalInterest = interest === 'Something else...' ? customInterest.trim() : interest
 
     if (!childName.trim()) return setError('What\'s their name?')
     if (!childAge) return setError('Pick an age range.')
@@ -84,10 +84,10 @@ function SignupForm() {
         <div className="max-w-md text-center">
           <p className="text-5xl mb-6">✨</p>
           <h1 className="text-3xl font-bold text-[#2C2A26] mb-4" style={{ fontFamily: 'Georgia, serif' }}>
-            Check your inbox tonight
+            Tonight&apos;s story is on its way.
           </h1>
           <p className="text-[#5a5550] text-lg leading-relaxed">
-            {childName}&apos;s first story is on its way — ready to read at bedtime.
+            Check your inbox tonight — {childName}&apos;s first story will be there. If you subscribe, a new one lands every week on the day you picked. Each story listens to the last. That&apos;s it. No app, no login, just a great bedtime.
           </p>
           <p className="text-[#aaa] text-sm mt-6">
             Check your spam folder if you don&apos;t see it, or add Silly Goose Tales to your contacts.
@@ -108,10 +108,10 @@ function SignupForm() {
 
         <div className="text-center mb-10">
           <h1 className="text-3xl font-bold text-[#2C2A26] mb-3" style={{ fontFamily: 'Georgia, serif' }}>
-            {plan ? `Start ${plan} plan` : 'Get one story free tonight'}
+            {plan ? `Start ${plan} plan` : 'Let’s write tonight’s story.'}
           </h1>
           <p className="text-[#5a5550]">
-            {plan ? 'Set up your child\'s stories in under a minute.' : 'No credit card. Story arrives tonight.'}
+            {plan ? 'Set up your child’s stories in under a minute.' : 'Free story tonight, then one a week after you subscribe. Takes 90 seconds to set up.'}
           </p>
         </div>
 
@@ -135,7 +135,7 @@ function SignupForm() {
           {/* Age range */}
           <div>
             <label className="block text-sm font-medium text-[#5a5550] mb-3">
-              How old are they?
+              How old is {childName || 'your child'}?
             </label>
             <div className="flex gap-3">
               {AGE_RANGES.map(a => (
@@ -167,7 +167,7 @@ function SignupForm() {
                 </button>
               ))}
             </div>
-            {interest === 'Something else…' && (
+            {interest === 'Something else...' && (
               <input
                 type="text"
                 value={customInterest}
@@ -227,7 +227,7 @@ function SignupForm() {
             disabled={loading}
             className="w-full bg-[#E8A838] text-white text-lg font-semibold py-4 rounded-xl hover:bg-[#d4952d] transition-colors disabled:opacity-60"
           >
-            {loading ? 'One moment…' : plan ? 'Continue to payment →' : `Send ${childName || 'the'} first story tonight →`}
+            {loading ? ‘One moment…’ : plan ? ‘Continue to payment →’ : childName ? `Send ${childName}’s story tonight →` : ‘Send tonight’s story →’}
           </button>
         </form>
       </div>

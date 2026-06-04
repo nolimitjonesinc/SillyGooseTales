@@ -1,7 +1,30 @@
 'use client'
 import Link from 'next/link'
+import { useState, useEffect } from 'react'
+
+const TAGLINES = [
+  "You've kept them alive all day. Let us handle the story.",
+  "They'll think you wrote it. You'll think you're a genius. We won't tell.",
+  "Because \"once upon a time, mommy needs wine\" is not a bedtime story.",
+  "Stop making stuff up in the dark. We made a better one.",
+  "They want a story. You want sleep. Done.",
+]
 
 export default function LandingPage() {
+  const [taglineIndex, setTaglineIndex] = useState(0)
+  const [visible, setVisible] = useState(true)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setVisible(false)
+      setTimeout(() => {
+        setTaglineIndex(i => (i + 1) % TAGLINES.length)
+        setVisible(true)
+      }, 400)
+    }, 4500)
+    return () => clearInterval(interval)
+  }, [])
+
   return (
     <main className="min-h-screen bg-[#FDF6EE]">
 
@@ -16,8 +39,11 @@ export default function LandingPage() {
         >
           A new story every week.<br />Written just for them.
         </h1>
-        <p className="text-lg text-[#5a5550] mb-8 leading-relaxed">
-          Personalized bedtime stories in your inbox — no app, no login, just stories.
+        <p
+          className="text-lg text-[#5a5550] mb-8 leading-relaxed transition-opacity duration-400"
+          style={{ opacity: visible ? 1 : 0 }}
+        >
+          {TAGLINES[taglineIndex]}
         </p>
         <Link
           href="/signup"
