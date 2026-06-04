@@ -71,7 +71,7 @@ export default function LandingPage() {
 
         {/* Rotating tagline */}
         <p
-          className="text-sm text-[#9a8f85] italic mt-6 transition-opacity duration-400 min-h-[1.5rem]"
+          className="text-sm text-[#5a5550] italic mt-6 transition-opacity duration-400 min-h-[1.5rem] bg-[#EDE4D8] px-4 py-2 rounded-full inline-block"
           style={{ opacity: visible ? 1 : 0 }}
         >
           {TAGLINES[taglineIndex]}
