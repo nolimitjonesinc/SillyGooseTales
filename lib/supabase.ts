@@ -51,6 +51,7 @@ export type Preferences = {
   themes_include: string[]
   themes_exclude: string[]
   tone_profile: string
+  tone_profiles: string[] | null
   mood: 'happy' | 'sleepy' | 'silly' | 'excited' | 'anxious' | null
   delivery_day: string
   delivery_slot: 'morning' | 'afternoon' | 'evening'
@@ -70,6 +71,8 @@ export type StoryQueueItem = {
   subscriber_id: string
   story_title: string
   story_body: string
+  story_token: string
+  illustration_url: string | null
   delivery_at: string
   status: 'queued' | 'delivered' | 'failed' | 'flagged'
   retry_count: number

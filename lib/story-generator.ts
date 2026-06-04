@@ -55,10 +55,14 @@ Use the child's name naturally in the first sentence (in action), at the emotion
 }
 
 export async function generateStory(prefs: Preferences): Promise<{ title: string; body: string }> {
-  const tone = getToneById(prefs.tone_profile)
+  const toneId = (prefs.tone_profiles?.length)
+    ? prefs.tone_profiles[Math.floor(Math.random() * prefs.tone_profiles.length)]
+    : prefs.tone_profile
+
+  const tone = getToneById(toneId)
   const ageBand = getAgeBandSpec(prefs.child_age)
 
-  if (!tone) throw new Error(`Unknown tone profile: ${prefs.tone_profile}`)
+  if (!tone) throw new Error(`Unknown tone profile: ${toneId}`)
 
   const systemPrompt = [
     LAYER_1_IDENTITY,

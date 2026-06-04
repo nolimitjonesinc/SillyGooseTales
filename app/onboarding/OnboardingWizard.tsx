@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 
 const INTERESTS = [
   'Dinosaurs', 'Space', 'Animals', 'Sports', 'Art', 'Vehicles',
-  'Ocean', 'Bugs', 'Castles', 'Robots', 'Fairies', 'Nature', 'Cooking', 'Music'
+  'Ocean', 'Bugs', 'Castles', 'Robots', 'Fairies', 'Nature', 'Cooking', 'Music', 'Something else...'
 ]
 const THEMES_IN = ['Adventure', 'Friendship', 'Family', 'Magic', 'Humor', 'Kindness', 'Courage', 'Curiosity']
 const THEMES_OUT = ['Scary content', 'Violence', 'Loss or death', 'Strangers', 'Nightmares', 'Potty humor']
@@ -15,6 +15,7 @@ const TONES = [
   { id: 'giggle_factory', name: 'Laugh-out-loud', desc: 'Absurd, silly, ends with a punchline' },
   { id: 'brave_heart', name: 'Brave and bold', desc: 'Emotionally honest, no forced cheerfulness' },
   { id: 'magic_and_wonder', name: 'Dreamy and magical', desc: 'Quiet wonder, hidden layers' },
+  { id: 'laugh_and_learn', name: 'Laugh & learn', desc: 'Clever curiosity with a dash of silly' },
 ]
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 const SLOTS = [
@@ -37,9 +38,10 @@ export default function OnboardingWizard() {
   const [childName, setChildName] = useState('')
   const [childAge, setChildAge] = useState<number | null>(null)
   const [interests, setInterests] = useState<string[]>([])
+  const [customInterest, setCustomInterest] = useState('')
   const [themesIn, setThemesIn] = useState<string[]>([])
   const [themesOut, setThemesOut] = useState<string[]>([])
-  const [tone, setTone] = useState('')
+  const [tones, setTones] = useState<string[]>([])
   const [deliveryDay, setDeliveryDay] = useState('Friday')
   const [deliverySlot, setDeliverySlot] = useState('evening')
   const [timezone, setTimezone] = useState('')
@@ -51,9 +53,39 @@ export default function OnboardingWizard() {
     setTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone)
   }, [])
 
+  useEffect(() => {
+    if (subscriberId) {
+      fetch(`/api/preferences?subscriber_id=${subscriberId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.childName) setChildName(data.childName)
+          if (data.childAge) setChildAge(data.childAge)
+          if (data.interests) setInterests(data.interests)
+          if (data.themesInclude) setThemesIn(data.themesInclude)
+          if (data.themesExclude) setThemesOut(data.themesExclude)
+          if (data.toneProfiles && data.toneProfiles.length > 0) {
+            setTones(data.toneProfiles)
+          } else if (data.toneProfile) {
+            setTones([data.toneProfile])
+          }
+          if (data.deliveryDay) setDeliveryDay(data.deliveryDay.charAt(0).toUpperCase() + data.deliveryDay.slice(1))
+          if (data.deliverySlot) setDeliverySlot(data.deliverySlot)
+          if (data.timezone) setTimezone(data.timezone)
+        })
+        .catch(() => {
+          // Silently continue if pre-fill fails
+        })
+    }
+  }, [subscriberId])
+
   async function handleComplete() {
     setSaving(true)
     try {
+      // Replace "Something else..." with custom interest if present
+      const finalInterests = interests.map(i =>
+        i === 'Something else...' && customInterest ? customInterest : i
+      ).filter(i => i !== 'Something else...')
+
       const res = await fetch('/api/onboarding', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -61,10 +93,10 @@ export default function OnboardingWizard() {
           subscriberId,
           childName,
           childAge,
-          interests,
+          interests: finalInterests,
           themesInclude: themesIn,
           themesExclude: themesOut,
-          toneProfile: tone,
+          toneProfiles: tones,
           deliveryDay: deliveryDay.toLowerCase(),
           deliverySlot,
           timezone
@@ -180,7 +212,17 @@ export default function OnboardingWizard() {
                       }`}>{i}</button>
                   ))}
                 </div>
-                {interests.length > 0 && (
+                {interests.includes('Something else...') && (
+                  <input
+                    autoFocus
+                    type="text"
+                    value={customInterest}
+                    onChange={e => setCustomInterest(e.target.value)}
+                    placeholder="e.g. Minecraft, ballet, sharks…"
+                    className="w-full text-lg px-5 py-3 border border-[#ddd] rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[#E8A838] text-[#2C2A26] mb-8"
+                  />
+                )}
+                {interests.filter(i => i !== 'Something else...' || customInterest).length > 0 && (
                   <button onClick={() => setStep(4)}
                     className="w-full bg-[#E8A838] text-white text-lg font-semibold py-4 rounded-xl hover:bg-[#d4952d] transition-colors">
                     Next →
@@ -230,21 +272,24 @@ export default function OnboardingWizard() {
                 <h2 className="text-2xl font-semibold text-[#2C2A26] mb-2">
                   What vibe feels right for {childName}?
                 </h2>
-                <p className="text-[#aaa] text-sm mb-6">Pick one</p>
+                <p className="text-[#aaa] text-sm mb-6">Pick at least one</p>
                 <div className="space-y-3 mb-8">
                   {TONES.map(t => (
-                    <button key={t.id} onClick={() => setTone(t.id)}
-                      className={`w-full text-left p-5 rounded-2xl border-2 transition-all ${
-                        tone === t.id
+                    <button key={t.id} onClick={() => setTones(toggle(tones, t.id))}
+                      className={`w-full text-left p-5 rounded-2xl border-2 transition-all relative ${
+                        tones.includes(t.id)
                           ? 'border-[#E8A838] bg-[#FFF8EE] scale-[1.01]'
                           : 'border-[#ddd] bg-white hover:border-[#E8A838] opacity-80'
                       }`}>
                       <p className="font-semibold text-[#2C2A26] text-lg">{t.name}</p>
                       <p className="text-[#5a5550] text-sm mt-1">{t.desc}</p>
+                      {tones.includes(t.id) && (
+                        <span className="absolute top-4 right-4 text-[#E8A838] text-xl">✓</span>
+                      )}
                     </button>
                   ))}
                 </div>
-                {tone && (
+                {tones.length > 0 && (
                   <button onClick={() => setStep(6)}
                     className="w-full bg-[#E8A838] text-white text-lg font-semibold py-4 rounded-xl hover:bg-[#d4952d] transition-colors">
                     Next →

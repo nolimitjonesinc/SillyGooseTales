@@ -11,13 +11,13 @@ export async function POST(req: NextRequest) {
     interests,
     themesInclude,
     themesExclude,
-    toneProfile,
+    toneProfiles,
     deliveryDay,
     deliverySlot,
     timezone
   } = body
 
-  if (!subscriberId || !childName || !childAge || !interests?.length || !toneProfile) {
+  if (!subscriberId || !childName || !childAge || !interests?.length || !toneProfiles?.length) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
   }
 
@@ -32,7 +32,8 @@ export async function POST(req: NextRequest) {
       interests,
       themes_include: themesInclude ?? [],
       themes_exclude: themesExclude ?? [],
-      tone_profile: toneProfile,
+      tone_profile: toneProfiles[0],
+      tone_profiles: toneProfiles,
       delivery_day: deliveryDay ?? 'friday',
       delivery_slot: deliverySlot ?? 'evening',
       timezone: timezone ?? 'America/New_York',
