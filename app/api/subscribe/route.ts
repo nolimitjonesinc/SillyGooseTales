@@ -5,9 +5,9 @@ import { generateMagicToken } from '@/lib/magic-tokens'
 import { calculateNextDeliveryAt } from '@/lib/scheduling'
 
 export async function POST(req: NextRequest) {
-  const { childName, interest, email } = await req.json()
+  const { childName, childAge, interest, toneProfile, email } = await req.json()
 
-  if (!childName || !interest || !email) {
+  if (!childName || !childAge || !interest || !toneProfile || !email) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
   }
 
@@ -66,9 +66,9 @@ export async function POST(req: NextRequest) {
     .upsert({
       subscriber_id: subscriberId,
       child_name: childName,
-      child_age: 6, // default — they'll set in onboarding
+      child_age: childAge,
       interests: [interest],
-      tone_profile: 'cozy_bedtime',
+      tone_profile: toneProfile,
       delivery_day: new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase(),
       delivery_slot: 'evening',
       timezone,

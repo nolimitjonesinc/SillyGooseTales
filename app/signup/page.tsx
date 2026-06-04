@@ -1,21 +1,38 @@
 'use client'
 import { useState, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
+
+const AGE_RANGES = [
+  { label: '3 – 4', value: 4 },
+  { label: '5 – 6', value: 6 },
+  { label: '7 – 8', value: 8 },
+  { label: '9 – 10', value: 10 },
+]
 
 const INTERESTS = [
   'Dinosaurs', 'Space', 'Animals', 'Sports', 'Art',
   'Vehicles', 'Ocean', 'Bugs', 'Castles', 'Robots',
-  'Fairies', 'Nature', 'Cooking', 'Music'
+  'Fairies', 'Nature', 'Cooking', 'Music', 'Something else…'
+]
+
+const TONES = [
+  { id: 'cozy_bedtime',   emoji: '🌙', name: 'Cozy Bedtime',     tagline: 'Warm, slow, perfect for drifting off' },
+  { id: 'grand_adventure',emoji: '⚡', name: 'Grand Adventure',   tagline: 'Bold, brave, and moving fast' },
+  { id: 'giggle_factory', emoji: '🤣', name: 'Giggle Factory',    tagline: 'Silly, absurd, laugh-out-loud' },
+  { id: 'brave_heart',    emoji: '💛', name: 'Brave Heart',       tagline: 'Honest — sits with the hard stuff' },
+  { id: 'magic_and_wonder',emoji: '✨', name: 'Magic & Wonder',   tagline: 'Hidden magic in ordinary things' },
+  { id: 'laugh_and_learn',emoji: '🔬', name: 'Laugh & Learn',    tagline: 'One real surprising fact in every story' },
 ]
 
 function SignupForm() {
-  const router = useRouter()
   const params = useSearchParams()
   const plan = params.get('plan')
 
   const [childName, setChildName] = useState('')
+  const [childAge, setChildAge] = useState<number | null>(null)
   const [interest, setInterest] = useState('')
   const [customInterest, setCustomInterest] = useState('')
+  const [toneProfile, setToneProfile] = useState('')
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [done, setDone] = useState(false)
@@ -24,40 +41,35 @@ function SignupForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const finalInterest = interest === 'Something else…' ? customInterest.trim() : interest
-    if (!childName || !finalInterest || !email) {
-      setError('Fill in all three fields to continue.')
-      return
-    }
+
+    if (!childName.trim()) return setError('What\'s their name?')
+    if (!childAge) return setError('Pick an age range.')
+    if (!finalInterest) return setError('What do they love?')
+    if (!toneProfile) return setError('Pick a story vibe.')
+    if (!email.trim()) return setError('Where should the stories land?')
+
     setLoading(true)
     setError('')
 
     try {
       if (plan) {
-        // Paid plan — go to Stripe checkout
         const res = await fetch('/api/checkout', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, plan })
         })
         const data = await res.json()
-        if (data.url) {
-          window.location.href = data.url
-        } else {
-          setError('Something went wrong. Try again.')
-        }
+        if (data.url) window.location.href = data.url
+        else setError('Something went wrong. Try again.')
       } else {
-        // Free trial
         const res = await fetch('/api/subscribe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ childName, interest: finalInterest, email })
+          body: JSON.stringify({ childName: childName.trim(), childAge, interest: finalInterest, toneProfile, email: email.trim() })
         })
         const data = await res.json()
-        if (data.success) {
-          setDone(true)
-        } else {
-          setError(data.error ?? 'Something went wrong.')
-        }
+        if (data.success) setDone(true)
+        else setError(data.error ?? 'Something went wrong.')
       }
     } catch {
       setError('Connection error. Try again.')
@@ -75,32 +87,38 @@ function SignupForm() {
             Check your inbox tonight
           </h1>
           <p className="text-[#5a5550] text-lg leading-relaxed">
-            {childName}&apos;s first story is on its way. It should arrive this evening — ready to read at bedtime.
+            {childName}&apos;s first story is on its way — ready to read at bedtime.
           </p>
           <p className="text-[#aaa] text-sm mt-6">
-            Check your spam folder if you don&apos;t see it — or add Silly Goose Tales to your contacts so it always finds its way home.
+            Check your spam folder if you don&apos;t see it, or add Silly Goose Tales to your contacts.
           </p>
         </div>
       </main>
     )
   }
 
+  const bubble = (active: boolean) =>
+    `px-4 py-2 rounded-full text-sm font-medium transition-colors cursor-pointer ${
+      active ? 'bg-[#E8A838] text-white' : 'bg-white border border-[#ddd] text-[#5a5550] hover:border-[#E8A838]'
+    }`
+
   return (
-    <main className="min-h-screen bg-[#FDF6EE] flex items-center justify-center px-6">
+    <main className="min-h-screen bg-[#FDF6EE] flex items-center justify-center px-6 py-16">
       <div className="max-w-md w-full">
+
         <div className="text-center mb-10">
           <h1 className="text-3xl font-bold text-[#2C2A26] mb-3" style={{ fontFamily: 'Georgia, serif' }}>
-            {plan ? `Start ${plan} plan` : "Get one story free tonight"}
+            {plan ? `Start ${plan} plan` : 'Get one story free tonight'}
           </h1>
           <p className="text-[#5a5550]">
-            {plan ? "Create your account, then customize your child's stories." : "No credit card. Story arrives in your inbox this evening."}
+            {plan ? 'Set up your child\'s stories in under a minute.' : 'No credit card. Story arrives tonight.'}
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Honeypot */}
+        <form onSubmit={handleSubmit} className="space-y-8">
           <input type="text" name="website" style={{ display: 'none' }} tabIndex={-1} autoComplete="off" />
 
+          {/* Name */}
           <div>
             <label className="block text-sm font-medium text-[#5a5550] mb-2">
               What&apos;s their name?
@@ -114,22 +132,37 @@ function SignupForm() {
             />
           </div>
 
+          {/* Age range */}
+          <div>
+            <label className="block text-sm font-medium text-[#5a5550] mb-3">
+              How old are they?
+            </label>
+            <div className="flex gap-3">
+              {AGE_RANGES.map(a => (
+                <button
+                  key={a.value}
+                  type="button"
+                  onClick={() => setChildAge(a.value)}
+                  className={`flex-1 py-3 rounded-xl text-sm font-semibold transition-colors ${
+                    childAge === a.value
+                      ? 'bg-[#E8A838] text-white'
+                      : 'bg-white border border-[#ddd] text-[#5a5550] hover:border-[#E8A838]'
+                  }`}
+                >
+                  {a.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Interests */}
           <div>
             <label className="block text-sm font-medium text-[#5a5550] mb-3">
               What does {childName || 'your child'} love most?
             </label>
             <div className="flex flex-wrap gap-2">
-              {[...INTERESTS, 'Something else…'].map(i => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => setInterest(i)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                    interest === i
-                      ? 'bg-[#E8A838] text-white'
-                      : 'bg-white border border-[#ddd] text-[#5a5550] hover:border-[#E8A838]'
-                  }`}
-                >
+              {INTERESTS.map(i => (
+                <button key={i} type="button" onClick={() => setInterest(i)} className={bubble(interest === i)}>
                   {i}
                 </button>
               ))}
@@ -139,13 +172,41 @@ function SignupForm() {
                 type="text"
                 value={customInterest}
                 onChange={e => setCustomInterest(e.target.value)}
-                placeholder="What do they love? (e.g. Minecraft, ballet, sharks…)"
+                placeholder="e.g. Minecraft, ballet, sharks…"
                 className="mt-3 w-full px-4 py-3 border border-[#ddd] rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[#E8A838] text-[#2C2A26]"
                 autoFocus
               />
             )}
           </div>
 
+          {/* Tone profile */}
+          <div>
+            <label className="block text-sm font-medium text-[#5a5550] mb-3">
+              What kind of stories does {childName || 'your child'} love?
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              {TONES.map(t => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => setToneProfile(t.id)}
+                  className={`text-left px-4 py-3 rounded-xl border transition-colors ${
+                    toneProfile === t.id
+                      ? 'bg-[#E8A838] border-[#E8A838] text-white'
+                      : 'bg-white border-[#ddd] text-[#2C2A26] hover:border-[#E8A838]'
+                  }`}
+                >
+                  <div className="text-xl mb-1">{t.emoji}</div>
+                  <div className="text-sm font-semibold leading-tight">{t.name}</div>
+                  <div className={`text-xs mt-0.5 leading-tight ${toneProfile === t.id ? 'text-white/80' : 'text-[#aaa]'}`}>
+                    {t.tagline}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Email */}
           <div>
             <label className="block text-sm font-medium text-[#5a5550] mb-2">
               Where should the stories land?
@@ -166,7 +227,7 @@ function SignupForm() {
             disabled={loading}
             className="w-full bg-[#E8A838] text-white text-lg font-semibold py-4 rounded-xl hover:bg-[#d4952d] transition-colors disabled:opacity-60"
           >
-            {loading ? 'One moment...' : plan ? 'Continue to payment →' : `Send ${childName || 'the'} first story tonight →`}
+            {loading ? 'One moment…' : plan ? 'Continue to payment →' : `Send ${childName || 'the'} first story tonight →`}
           </button>
         </form>
       </div>
