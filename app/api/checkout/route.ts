@@ -1,13 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createCheckout } from '@lemonsqueezy/lemonsqueezy.js'
 import { supabaseAdmin } from '@/lib/supabase'
-import { getStripe } from '@/lib/clients'
+import { initLemonSqueezy } from '@/lib/clients'
 
 export async function POST(req: NextRequest) {
+  initLemonSqueezy()
+
   const { email, plan, subscriberId } = await req.json()
 
-  const priceId = plan === 'annual'
-    ? process.env.STRIPE_PRICE_ID_ANNUAL!
-    : process.env.STRIPE_PRICE_ID_MONTHLY!
+  const variantId = plan === 'annual'
+    ? Number(process.env.LEMONSQUEEZY_VARIANT_ID_ANNUAL!)
+    : Number(process.env.LEMONSQUEEZY_VARIANT_ID_MONTHLY!)
+
+  const storeId = Number(process.env.LEMONSQUEEZY_STORE_ID!)
 
   // Get or create subscriber
   let subId = subscriberId
@@ -32,18 +37,20 @@ export async function POST(req: NextRequest) {
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL!
 
-  const session = await getStripe().checkout.sessions.create({
-    payment_method_types: ['card'],
-    mode: 'subscription',
-    line_items: [{ price: priceId, quantity: 1 }],
-    success_url: `${appUrl}/onboarding?session_id={CHECKOUT_SESSION_ID}&subscriber_id=${subId}`,
-    cancel_url: `${appUrl}/?cancelled=1`,
-    customer_email: email.toLowerCase(),
-    metadata: { subscriber_id: subId },
-    subscription_data: {
-      metadata: { subscriber_id: subId }
+  const { data, error } = await createCheckout(storeId, variantId, {
+    checkoutData: {
+      email: email.toLowerCase(),
+      custom: { subscriber_id: subId }
+    },
+    productOptions: {
+      redirectUrl: `${appUrl}/onboarding?subscriber_id=${subId}`,
+      receiptLinkUrl: `${appUrl}/onboarding?subscriber_id=${subId}`,
     }
   })
 
-  return NextResponse.json({ url: session.url })
+  if (error || !data?.data?.attributes?.url) {
+    return NextResponse.json({ error: 'Failed to create checkout' }, { status: 500 })
+  }
+
+  return NextResponse.json({ url: data.data.attributes.url })
 }

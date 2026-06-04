@@ -71,6 +71,7 @@ export async function POST(req: NextRequest) {
         subscriber_id: subscriberId,
         story_title: story.title,
         story_body: story.body,
+        story_token: crypto.randomUUID(),
         delivery_at: deliveryAt,
         status: 'queued',
         qc_score: qcScore
@@ -92,6 +93,7 @@ export async function POST(req: NextRequest) {
       subscriber_id: subscriberId,
       story_title: lastStory.title,
       story_body: lastStory.body,
+      story_token: crypto.randomUUID(),
       delivery_at: deliveryAt,
       status: 'flagged',
       retry_count: MAX_QC_RETRIES,

@@ -33,8 +33,8 @@ export const supabaseAdmin = new Proxy({} as SupabaseClient, {
 export type Subscriber = {
   id: string
   email: string
-  stripe_customer_id: string | null
-  stripe_subscription_id: string | null
+  lemonsqueezy_customer_id: string | null
+  lemonsqueezy_subscription_id: string | null
   subscription_status: 'free_trial' | 'active' | 'paused' | 'at_risk' | 're_engagement_paused' | 'churned' | 'cancelled'
   is_admin: boolean
   magic_token: string | null

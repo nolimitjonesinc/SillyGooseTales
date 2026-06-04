@@ -1,24 +1,25 @@
 import {
-  Html, Head, Body, Container, Text, Link, Hr, Preview
+  Html, Head, Body, Container, Text, Link, Button, Hr, Preview
 } from '@react-email/components'
 
 interface StoryEmailProps {
   childName: string
   storyTitle: string
-  storyBody: string
+  storyPreview: string
+  storyPageUrl: string
   preferencesUrl: string
   pauseUrl: string
   unsubUrl: string
   moodBaseUrl: string
 }
 
-// Near-plain-text template — designed for Gmail Primary placement
-// No hero images, no background colors, no embedded web fonts
-// Georgia system serif only — decorative HTML = Promotions tab
+// Near-plain-text teaser — story hook + link to hosted story page
+// No heavy HTML, no hero images — designed for Gmail Primary placement
 export function StoryEmail({
   childName,
   storyTitle,
-  storyBody,
+  storyPreview,
+  storyPageUrl,
   preferencesUrl,
   pauseUrl,
   unsubUrl,
@@ -29,7 +30,7 @@ export function StoryEmail({
   return (
     <Html lang="en">
       <Head />
-      <Preview>{childName} is going to love this one.</Preview>
+      <Preview>{childName}&apos;s story just arrived. Tap to read.</Preview>
       <Body style={{ backgroundColor: '#ffffff', margin: '0', padding: '0' }}>
         <Container style={{
           maxWidth: '600px',
@@ -38,7 +39,7 @@ export function StoryEmail({
           fontFamily: 'Georgia, "Times New Roman", serif'
         }}>
 
-          {/* Sender context — plain text feel */}
+          {/* Sender context */}
           <Text style={{
             fontSize: '14px',
             color: '#999999',
@@ -48,20 +49,20 @@ export function StoryEmail({
             A story for {childName}, {dayOfWeek} evening
           </Text>
 
-          {/* Story title — the one flourish */}
+          {/* Story title */}
           <Text style={{
             fontSize: '28px',
             fontWeight: 'bold',
             color: '#E8A838',
             fontFamily: 'Georgia, serif',
             lineHeight: '1.3',
-            margin: '0 0 32px 0'
+            margin: '0 0 28px 0'
           }}>
             {storyTitle}
           </Text>
 
-          {/* Story body — paragraphs */}
-          {storyBody.split('\n\n').filter(Boolean).map((paragraph, i) => (
+          {/* Story preview — first 2 paragraphs */}
+          {storyPreview.split('\n\n').filter(Boolean).map((paragraph, i) => (
             <Text key={i} style={{
               fontSize: '18px',
               lineHeight: '1.8',
@@ -73,28 +74,38 @@ export function StoryEmail({
             </Text>
           ))}
 
-          {/* Story close */}
+          {/* Fade hint */}
           <Text style={{
-            textAlign: 'center' as const,
-            color: '#cccccc',
             fontSize: '18px',
-            margin: '32px 0 6px 0'
+            lineHeight: '1.8',
+            color: '#aaaaaa',
+            fontFamily: 'Georgia, serif',
+            margin: '0 0 32px 0',
+            fontStyle: 'italic'
           }}>
-            ✦
-          </Text>
-          <Text style={{
-            textAlign: 'center' as const,
-            fontSize: '11px',
-            letterSpacing: '0.12em',
-            textTransform: 'uppercase' as const,
-            color: '#cccccc',
-            margin: '0 0 40px 0',
-            fontFamily: 'Georgia, serif'
-          }}>
-            {storyTitle}
+            ...
           </Text>
 
-          {/* Mood selector — one-tap for next story */}
+          {/* CTA — the whole point of the email */}
+          <Button
+            href={storyPageUrl}
+            style={{
+              backgroundColor: '#E8A838',
+              color: '#ffffff',
+              fontFamily: 'Georgia, serif',
+              fontSize: '17px',
+              fontWeight: 'bold',
+              textDecoration: 'none',
+              padding: '14px 32px',
+              borderRadius: '6px',
+              display: 'inline-block',
+              margin: '0 0 40px 0'
+            }}
+          >
+            Read {childName}&apos;s full story →
+          </Button>
+
+          {/* Mood selector */}
           <Text style={{
             fontSize: '13px',
             color: '#888888',
@@ -117,7 +128,7 @@ export function StoryEmail({
             <Link href={`${moodBaseUrl}&mood=anxious`} style={{ textDecoration: 'none' }}>🤗</Link>
           </Text>
 
-          {/* Footer — 3 lines only */}
+          {/* Footer */}
           <Hr style={{ borderColor: '#eeeeee', margin: '0 0 20px 0' }} />
           <Text style={{
             fontSize: '12px',

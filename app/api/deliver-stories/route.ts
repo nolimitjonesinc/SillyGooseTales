@@ -62,6 +62,15 @@ export async function GET() {
         continue
       }
 
+      // First 2 paragraphs as the email teaser
+      const storyPreview = story.story_body
+        .split('\n\n')
+        .filter(Boolean)
+        .slice(0, 2)
+        .join('\n\n')
+
+      const storyPageUrl = `${baseUrl}/story/${story.story_token}`
+
       const { data: emailData, error: emailError } = await getResend().emails.send({
         from: `${process.env.RESEND_FROM_NAME} <${process.env.RESEND_FROM_EMAIL}>`,
         to: sub.email,
@@ -73,7 +82,8 @@ export async function GET() {
         react: StoryEmail({
           childName: prefs.child_name,
           storyTitle: story.story_title,
-          storyBody: story.story_body,
+          storyPreview,
+          storyPageUrl,
           preferencesUrl: `${baseUrl}/preferences?token=${magicToken}`,
           pauseUrl: `${baseUrl}/pause?token=${magicToken}`,
           unsubUrl: `${baseUrl}/unsubscribe?token=${magicToken}`,
