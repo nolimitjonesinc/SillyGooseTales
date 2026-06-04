@@ -27,8 +27,9 @@ const TONES = [
 function SignupForm() {
   const params = useSearchParams()
   const plan = params.get('plan')
+  const nameParam = params.get('name') ?? ''
 
-  const [childName, setChildName] = useState('')
+  const [childName, setChildName] = useState(nameParam)
   const [childAge, setChildAge] = useState<number | null>(null)
   const [interest, setInterest] = useState('')
   const [customInterest, setCustomInterest] = useState('')
@@ -37,6 +38,13 @@ function SignupForm() {
   const [loading, setLoading] = useState(false)
   const [done, setDone] = useState(false)
   const [error, setError] = useState('')
+  const [copied, setCopied] = useState(false)
+
+  function copyShareLink() {
+    navigator.clipboard.writeText('https://www.sillygoosetales.com')
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2500)
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -80,18 +88,48 @@ function SignupForm() {
 
   if (done) {
     return (
-      <main className="min-h-screen bg-[#FDF6EE] flex items-center justify-center px-6">
-        <div className="max-w-md text-center">
-          <p className="text-5xl mb-6">✨</p>
-          <h1 className="text-3xl font-bold text-[#2C2A26] mb-4" style={{ fontFamily: 'Georgia, serif' }}>
-            Tonight&apos;s story is on its way.
+      <main className="min-h-screen bg-[#FDF6EE] flex items-center justify-center px-6 py-12">
+        <div className="max-w-md w-full text-center">
+
+          <h1 className="text-3xl font-bold text-[#2C2A26] mb-3" style={{ fontFamily: 'Georgia, serif' }}>
+            {childName}&apos;s story is being written.
           </h1>
-          <p className="text-[#5a5550] text-lg leading-relaxed">
-            Check your inbox tonight — {childName}&apos;s first story will be there. If you subscribe, a new one lands every night. Each story listens to the last. That&apos;s it. No app, no login, just a great bedtime.
+          <p className="text-[#5a5550] text-base leading-relaxed mb-8">
+            Check your inbox — it arrives in the next few minutes. No app, no login, just a great bedtime.
           </p>
-          <p className="text-[#aaa] text-sm mt-6">
-            Check your spam folder if you don&apos;t see it, or add Silly Goose Tales to your contacts.
+
+          <div className="bg-[#2C2A26] rounded-2xl p-6 mb-4 text-left">
+            <p className="text-white font-semibold text-lg mb-1" style={{ fontFamily: 'Georgia, serif' }}>
+              Like what&apos;s coming?
+            </p>
+            <p className="text-[#aaa] text-sm mb-4">
+              Lock in a new story every single night for $9.99/month. Each one builds on the last.
+            </p>
+            <a
+              href="/signup?plan=monthly"
+              className="block w-full bg-[#E8A838] text-white text-sm font-semibold py-3 rounded-xl hover:bg-[#d4952d] transition-colors text-center"
+            >
+              Get nightly stories — $9.99/mo
+            </a>
+          </div>
+
+          <div className="bg-white border border-[#e8ddd0] rounded-2xl p-5 mb-4">
+            <p className="text-[#2C2A26] font-semibold text-sm mb-1">Know another parent who needs this?</p>
+            <p className="text-[#aaa] text-xs mb-3">Share the link — first story is always free.</p>
+            <button
+              onClick={copyShareLink}
+              className="w-full border border-[#e8ddd0] text-[#5a5550] text-sm font-medium py-2.5 rounded-xl hover:border-[#E8A838] transition-colors"
+            >
+              {copied ? 'Link copied!' : 'Copy share link'}
+            </button>
+          </div>
+
+          <p className="text-[#aaa] text-xs leading-relaxed">
+            Don&apos;t see it? Check spam, or add{' '}
+            <span className="text-[#5a5550] font-medium">stories@sillygoosetales.com</span>{' '}
+            to your contacts.
           </p>
+
         </div>
       </main>
     )
@@ -108,12 +146,18 @@ function SignupForm() {
 
         <div className="text-center mb-10">
           <h1 className="text-3xl font-bold text-[#2C2A26] mb-3" style={{ fontFamily: 'Georgia, serif' }}>
-            {plan ? `Start ${plan} plan` : "Let's write tonight's story."}
+            {plan === 'annual'
+              ? 'Best deal. Best bedtimes.'
+              : plan === 'monthly'
+              ? 'Every bedtime, handled.'
+              : "Let's write tonight's story."}
           </h1>
           <p className="text-[#5a5550]">
-            {plan
-              ? "Set up your child's stories in under a minute."
-              : "Free story tonight, then one every night after you subscribe. Takes 90 seconds to set up."}
+            {plan === 'annual'
+              ? 'A full year of nightly stories — 90 seconds to set up, cancel anytime.'
+              : plan === 'monthly'
+              ? 'A new story every night, each one building on the last. 90 seconds to set up.'
+              : 'Free story tonight, then one every night after you subscribe. Takes 90 seconds.'}
           </p>
         </div>
 
