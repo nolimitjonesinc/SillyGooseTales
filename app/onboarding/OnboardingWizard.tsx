@@ -17,7 +17,6 @@ const TONES = [
   { id: 'magic_and_wonder', name: 'Dreamy and magical', desc: 'Quiet wonder, hidden layers' },
   { id: 'laugh_and_learn', name: 'Laugh & learn', desc: 'Clever curiosity with a dash of silly' },
 ]
-const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 const SLOTS = [
   { id: 'morning', label: 'Morning', sub: '7–8am' },
   { id: 'afternoon', label: 'Afternoon', sub: '3–4pm' },
@@ -42,7 +41,6 @@ export default function OnboardingWizard() {
   const [themesIn, setThemesIn] = useState<string[]>([])
   const [themesOut, setThemesOut] = useState<string[]>([])
   const [tones, setTones] = useState<string[]>([])
-  const [deliveryDay, setDeliveryDay] = useState('Friday')
   const [deliverySlot, setDeliverySlot] = useState('evening')
   const [timezone, setTimezone] = useState('')
   const [saving, setSaving] = useState(false)
@@ -58,18 +56,18 @@ export default function OnboardingWizard() {
       fetch(`/api/preferences?subscriber_id=${subscriberId}`)
         .then(res => res.json())
         .then(data => {
-          if (data.childName) setChildName(data.childName)
-          if (data.childAge) setChildAge(data.childAge)
+          if (data.child_name) setChildName(data.child_name)
+          if (data.child_age) setChildAge(data.child_age)
           if (data.interests) setInterests(data.interests)
-          if (data.themesInclude) setThemesIn(data.themesInclude)
-          if (data.themesExclude) setThemesOut(data.themesExclude)
-          if (data.toneProfiles && data.toneProfiles.length > 0) {
-            setTones(data.toneProfiles)
-          } else if (data.toneProfile) {
-            setTones([data.toneProfile])
+          if (data.themes_include) setThemesIn(data.themes_include)
+          if (data.themes_exclude) setThemesOut(data.themes_exclude)
+          if (data.tone_profiles && data.tone_profiles.length > 0) {
+            setTones(data.tone_profiles)
+          } else if (data.tone_profile) {
+            setTones([data.tone_profile])
           }
-          if (data.deliveryDay) setDeliveryDay(data.deliveryDay.charAt(0).toUpperCase() + data.deliveryDay.slice(1))
-          if (data.deliverySlot) setDeliverySlot(data.deliverySlot)
+          if (data.delivery_day) setDeliveryDay(data.delivery_day.charAt(0).toUpperCase() + data.delivery_day.slice(1))
+          if (data.delivery_slot) setDeliverySlot(data.delivery_slot)
           if (data.timezone) setTimezone(data.timezone)
         })
         .catch(() => {
@@ -97,7 +95,7 @@ export default function OnboardingWizard() {
           themesInclude: themesIn,
           themesExclude: themesOut,
           toneProfiles: tones,
-          deliveryDay: deliveryDay.toLowerCase(),
+          deliveryDay: 'daily',
           deliverySlot,
           timezone
         })
@@ -117,17 +115,64 @@ export default function OnboardingWizard() {
   const progress = (step / TOTAL_STEPS) * 100
 
   if (done) {
+    const floaters = ['🪿', '⭐', '📖', '✨', '🌙', '🪄', '🎉', '⭐', '🪿', '✨']
     return (
-      <main className="min-h-screen bg-[#FDF6EE] flex items-center justify-center px-6">
-        <div className="max-w-md text-center">
-          <p className="text-5xl mb-6">🌟</p>
-          <h1 className="text-3xl font-bold text-[#2C2A26] mb-4" style={{ fontFamily: 'Georgia, serif' }}>
-            All set!
-          </h1>
-          <p className="text-[#5a5550] text-lg leading-relaxed">
-            {childName}&apos;s first story arrives {nextDelivery ? `on ${nextDelivery}` : 'soon'}.
-            We&apos;ll send a sample story shortly.
-          </p>
+      <main className="min-h-screen bg-[#FDF6EE] flex items-center justify-center px-6 overflow-hidden relative">
+        {floaters.map((emoji, i) => (
+          <motion.div
+            key={i}
+            className="absolute text-3xl pointer-events-none select-none"
+            style={{ left: '50%', top: '50%' }}
+            initial={{ opacity: 0, scale: 0, x: 0, y: 0 }}
+            animate={{
+              opacity: [0, 1, 1, 0],
+              scale: [0, 1.3, 1, 0.6],
+              x: Math.round(Math.cos((i * 36) * Math.PI / 180) * (120 + (i % 3) * 60)),
+              y: Math.round(Math.sin((i * 36) * Math.PI / 180) * (100 + (i % 3) * 50)),
+            }}
+            transition={{ delay: 0.1 + i * 0.08, duration: 1.8, ease: 'easeOut' }}
+          >
+            {emoji}
+          </motion.div>
+        ))}
+
+        <div className="max-w-md text-center relative z-10">
+          <motion.div
+            initial={{ scale: 0, rotate: -20 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: 'spring', stiffness: 260, damping: 14, delay: 0.1 }}
+            className="text-8xl mb-6 inline-block"
+          >
+            🪿
+          </motion.div>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.45, duration: 0.5 }}
+            className="text-4xl font-bold text-[#2C2A26] mb-4"
+            style={{ fontFamily: 'Georgia, serif' }}
+          >
+            {childName}&apos;s story universe is live.
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7, duration: 0.4 }}
+            className="text-[#5a5550] text-xl leading-relaxed mb-3"
+          >
+            One fresh story, every single day.
+          </motion.p>
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1, duration: 0.5 }}
+            className="text-[#aaa] text-sm leading-relaxed"
+          >
+            The first one is being written right now — check your inbox in a few minutes.
+          </motion.p>
         </div>
       </main>
     )
@@ -176,7 +221,7 @@ export default function OnboardingWizard() {
                 {childName && (
                   <>
                     <div className="flex gap-3 flex-wrap mb-8">
-                      {Array.from({ length: 8 }, (_, i) => i + 3).map(age => (
+                      {Array.from({ length: 9 }, (_, i) => i + 2).map(age => (
                         <button key={age} onClick={() => setChildAge(age)}
                           className={`w-14 h-14 rounded-full text-lg font-semibold transition-colors ${
                             childAge === age
@@ -300,47 +345,44 @@ export default function OnboardingWizard() {
 
             {step === 6 && (
               <div className="pt-8">
-                <h2 className="text-2xl font-semibold text-[#2C2A26] mb-8">
-                  When should {childName}&apos;s story arrive?
+                <h2 className="text-2xl font-semibold text-[#2C2A26] mb-2">
+                  What time should {childName}&apos;s story arrive?
                 </h2>
-                <div className="mb-6">
-                  <p className="text-sm font-medium text-[#5a5550] mb-3">Day</p>
-                  <div className="flex flex-wrap gap-2">
-                    {DAYS.map(d => (
-                      <button key={d} onClick={() => setDeliveryDay(d)}
-                        className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                          deliveryDay === d
-                            ? 'bg-[#E8A838] text-white'
-                            : 'bg-white border-2 border-[#ddd] text-[#5a5550] hover:border-[#E8A838]'
-                        }`}>{d}</button>
-                    ))}
-                  </div>
+                <p className="text-[#aaa] text-sm mb-6">A new story lands every day.</p>
+                <div className="flex gap-3 mb-8">
+                  {SLOTS.map(s => (
+                    <button key={s.id} onClick={() => setDeliverySlot(s.id)}
+                      className={`flex-1 py-4 rounded-xl text-center transition-colors border-2 ${
+                        deliverySlot === s.id
+                          ? 'border-[#E8A838] bg-[#FFF8EE]'
+                          : 'border-[#ddd] bg-white hover:border-[#E8A838]'
+                      }`}>
+                      <p className="font-semibold text-[#2C2A26]">{s.label}</p>
+                      <p className="text-xs text-[#aaa]">{s.sub}</p>
+                    </button>
+                  ))}
                 </div>
-                <div className="mb-6">
-                  <p className="text-sm font-medium text-[#5a5550] mb-3">Time</p>
-                  <div className="flex gap-3">
-                    {SLOTS.map(s => (
-                      <button key={s.id} onClick={() => setDeliverySlot(s.id)}
-                        className={`flex-1 py-4 rounded-xl text-center transition-colors border-2 ${
-                          deliverySlot === s.id
-                            ? 'border-[#E8A838] bg-[#FFF8EE]'
-                            : 'border-[#ddd] bg-white hover:border-[#E8A838]'
-                        }`}>
-                        <p className="font-semibold text-[#2C2A26]">{s.label}</p>
-                        <p className="text-xs text-[#aaa]">{s.sub}</p>
-                      </button>
-                    ))}
-                  </div>
+                <div className="mb-8">
+                  <p className="text-sm font-medium text-[#5a5550] mb-2">Your timezone</p>
+                  <select
+                    value={timezone}
+                    onChange={e => setTimezone(e.target.value)}
+                    className="w-full px-4 py-3 border border-[#ddd] rounded-xl bg-white text-[#2C2A26] focus:outline-none focus:ring-2 focus:ring-[#E8A838]"
+                  >
+                    <option value="America/New_York">Eastern — New York, Miami, Atlanta</option>
+                    <option value="America/Chicago">Central — Chicago, Dallas, Houston</option>
+                    <option value="America/Denver">Mountain — Denver, Salt Lake City</option>
+                    <option value="America/Phoenix">Arizona — Phoenix (no daylight saving)</option>
+                    <option value="America/Los_Angeles">Pacific — Los Angeles, Seattle</option>
+                    <option value="America/Anchorage">Alaska</option>
+                    <option value="Pacific/Honolulu">Hawaii</option>
+                    <option value="Europe/London">London</option>
+                    <option value="Europe/Paris">Paris / Berlin / Amsterdam</option>
+                    <option value="Australia/Sydney">Sydney / Melbourne</option>
+                    <option value="Australia/Perth">Perth</option>
+                    <option value="America/Toronto">Toronto / Ottawa</option>
+                  </select>
                 </div>
-                {timezone && (
-                  <p className="text-sm text-[#aaa] mb-6">
-                    Timezone: {timezone.replace(/_/g, ' ')}{' '}
-                    <button className="underline text-[#5a5550]" onClick={() => {
-                      const tz = prompt('Enter your timezone (e.g. America/Chicago):', timezone)
-                      if (tz) setTimezone(tz)
-                    }}>Change it</button>
-                  </p>
-                )}
                 <button onClick={() => setStep(7)}
                   className="w-full bg-[#E8A838] text-white text-lg font-semibold py-4 rounded-xl hover:bg-[#d4952d] transition-colors">
                   Start the stories →

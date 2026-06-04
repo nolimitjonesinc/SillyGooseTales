@@ -17,22 +17,26 @@ export function calculateNextDeliveryAt(
   deliveryDay: string,
   deliverySlot: string
 ): Date {
-  const targetDayIndex = DAY_INDICES[deliveryDay.toLowerCase()] ?? 1
   const targetHour = SLOT_HOURS[deliverySlot.toLowerCase()] ?? 19
-
   const nowUtc = new Date()
   const nowLocal = toZonedTime(nowUtc, timezone)
 
-  // Find next occurrence of the target day
-  const currentDay = nowLocal.getDay()
-  let daysUntil = targetDayIndex - currentDay
-  if (daysUntil < 0) daysUntil += 7
-  // If it's the same day but the hour has passed, schedule for next week
-  if (daysUntil === 0 && nowLocal.getHours() >= targetHour) daysUntil = 7
-
   const localDelivery = new Date(nowLocal)
-  localDelivery.setDate(localDelivery.getDate() + daysUntil)
   localDelivery.setHours(targetHour, 0, 0, 0)
+
+  if (deliveryDay.toLowerCase() === 'daily') {
+    // If today's slot has passed, schedule for tomorrow
+    if (nowLocal.getHours() >= targetHour) {
+      localDelivery.setDate(localDelivery.getDate() + 1)
+    }
+  } else {
+    const targetDayIndex = DAY_INDICES[deliveryDay.toLowerCase()] ?? 1
+    const currentDay = nowLocal.getDay()
+    let daysUntil = targetDayIndex - currentDay
+    if (daysUntil < 0) daysUntil += 7
+    if (daysUntil === 0 && nowLocal.getHours() >= targetHour) daysUntil = 7
+    localDelivery.setDate(localDelivery.getDate() + daysUntil)
+  }
 
   return fromZonedTime(localDelivery, timezone)
 }
