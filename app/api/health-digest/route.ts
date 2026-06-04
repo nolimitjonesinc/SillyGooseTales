@@ -10,7 +10,7 @@ export async function GET() {
 
   // Delivery stats
   const { data: logs } = await supabaseAdmin
-    .from('storydrop_delivery_log')
+    .from('sillytales_delivery_log')
     .select('status')
     .gte('created_at', sevenDaysAgo)
 
@@ -22,7 +22,7 @@ export async function GET() {
 
   // QC stats
   const { data: queued } = await supabaseAdmin
-    .from('storydrop_story_queue')
+    .from('sillytales_story_queue')
     .select('status, retry_count, qc_score')
     .gte('created_at', sevenDaysAgo)
 
@@ -31,17 +31,17 @@ export async function GET() {
 
   // Subscriber counts
   const { count: activeCount } = await supabaseAdmin
-    .from('storydrop_subscribers')
+    .from('sillytales_subscribers')
     .select('*', { count: 'exact', head: true })
     .eq('subscription_status', 'active')
 
   const { count: atRiskCount } = await supabaseAdmin
-    .from('storydrop_subscribers')
+    .from('sillytales_subscribers')
     .select('*', { count: 'exact', head: true })
     .eq('subscription_status', 'at_risk')
 
   const { count: totalCount } = await supabaseAdmin
-    .from('storydrop_subscribers')
+    .from('sillytales_subscribers')
     .select('*', { count: 'exact', head: true })
 
   const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
@@ -74,7 +74,7 @@ ${allGood ? 'Everything looks clean. Silly Goose Tales is humming.' : `Action ne
 
   // Churn early warning: increment consecutive_unopened_count for subscribers with no opens this week
   const { data: recentDeliveries } = await supabaseAdmin
-    .from('storydrop_delivery_log')
+    .from('sillytales_delivery_log')
     .select('subscriber_id, email_opened')
     .gte('created_at', sevenDaysAgo)
 
@@ -87,7 +87,7 @@ ${allGood ? 'Everything looks clean. Silly Goose Tales is humming.' : `Action ne
     for (const subscriberId of deliveredTo) {
       if (!openedBySubscriber.has(subscriberId)) {
         const { data: sub } = await supabaseAdmin
-          .from('storydrop_subscribers')
+          .from('sillytales_subscribers')
           .select('consecutive_unopened_count, subscription_status')
           .eq('id', subscriberId)
           .single()
@@ -98,12 +98,12 @@ ${allGood ? 'Everything looks clean. Silly Goose Tales is humming.' : `Action ne
 
         if (newCount >= 3 && sub.subscription_status === 'active') {
           await supabaseAdmin
-            .from('storydrop_subscribers')
+            .from('sillytales_subscribers')
             .update({ consecutive_unopened_count: newCount, subscription_status: 'at_risk' })
             .eq('id', subscriberId)
         } else {
           await supabaseAdmin
-            .from('storydrop_subscribers')
+            .from('sillytales_subscribers')
             .update({ consecutive_unopened_count: newCount })
             .eq('id', subscriberId)
         }

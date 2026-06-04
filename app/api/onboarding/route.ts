@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
   const nextDeliveryAt = calculateNextDeliveryAt(timezone ?? 'America/New_York', deliveryDay ?? 'friday', deliverySlot ?? 'evening')
 
   const { error } = await supabaseAdmin
-    .from('storydrop_preferences')
+    .from('sillytales_preferences')
     .upsert({
       subscriber_id: subscriberId,
       child_name: childName,

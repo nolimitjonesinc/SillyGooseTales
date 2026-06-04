@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
       if (!subscriberId) break
 
       await supabaseAdmin
-        .from('storydrop_subscribers')
+        .from('sillytales_subscribers')
         .update({
           stripe_customer_id: session.customer as string,
           stripe_subscription_id: session.subscription as string,
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
       const status = sub.status === 'active' ? 'active' : 'cancelled'
 
       await supabaseAdmin
-        .from('storydrop_subscribers')
+        .from('sillytales_subscribers')
         .update({ subscription_status: status })
         .eq('stripe_subscription_id', sub.id)
       break
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
       const sub = event.data.object as Stripe.Subscription
 
       await supabaseAdmin
-        .from('storydrop_subscribers')
+        .from('sillytales_subscribers')
         .update({ subscription_status: 'cancelled' })
         .eq('stripe_subscription_id', sub.id)
       break
@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
       if (!subId) break
 
       await supabaseAdmin
-        .from('storydrop_subscribers')
+        .from('sillytales_subscribers')
         .update({ subscription_status: 'paused' })
         .eq('stripe_subscription_id', subId)
       break

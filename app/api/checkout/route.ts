@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
   let subId = subscriberId
   if (!subId) {
     const { data } = await supabaseAdmin
-      .from('storydrop_subscribers')
+      .from('sillytales_subscribers')
       .select('id')
       .eq('email', email.toLowerCase())
       .single()
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
 
   if (!subId) {
     const { data, error } = await supabaseAdmin
-      .from('storydrop_subscribers')
+      .from('sillytales_subscribers')
       .insert({ email: email.toLowerCase(), subscription_status: 'free_trial' })
       .select('id')
       .single()

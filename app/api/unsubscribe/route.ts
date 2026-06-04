@@ -10,12 +10,12 @@ export async function GET(req: NextRequest) {
   if (!subscriberId) return NextResponse.json({ error: 'Invalid or expired link' }, { status: 401 })
 
   await supabaseAdmin
-    .from('storydrop_subscribers')
+    .from('sillytales_subscribers')
     .update({ subscription_status: 'churned' })
     .eq('id', subscriberId)
 
   await supabaseAdmin
-    .from('storydrop_story_queue')
+    .from('sillytales_story_queue')
     .update({ status: 'failed' })
     .eq('subscriber_id', subscriberId)
     .eq('status', 'queued')

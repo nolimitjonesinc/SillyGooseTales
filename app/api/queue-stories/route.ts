@@ -12,7 +12,7 @@ export async function GET() {
   const in24h = new Date(now.getTime() + 24 * 60 * 60 * 1000)
 
   const { data: subscribers, error } = await supabaseAdmin
-    .from('storydrop_preferences')
+    .from('sillytales_preferences')
     .select('subscriber_id, next_delivery_at')
     .not('next_delivery_at', 'is', null)
     .gte('next_delivery_at', now.toISOString())
@@ -29,7 +29,7 @@ export async function GET() {
 
   // Filter out subscribers who already have a queued story for this window
   const { data: alreadyQueued } = await supabaseAdmin
-    .from('storydrop_story_queue')
+    .from('sillytales_story_queue')
     .select('subscriber_id')
     .in('subscriber_id', subscribers.map(s => s.subscriber_id))
     .gte('delivery_at', now.toISOString())
@@ -45,7 +45,7 @@ export async function GET() {
 
   // Also verify subscribers are active
   const { data: activeStatuses } = await supabaseAdmin
-    .from('storydrop_subscribers')
+    .from('sillytales_subscribers')
     .select('id, subscription_status')
     .in('id', toGenerate.map(s => s.subscriber_id))
     .in('subscription_status', ['active'])

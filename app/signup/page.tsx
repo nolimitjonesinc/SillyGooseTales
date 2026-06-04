@@ -15,6 +15,7 @@ function SignupForm() {
 
   const [childName, setChildName] = useState('')
   const [interest, setInterest] = useState('')
+  const [customInterest, setCustomInterest] = useState('')
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [done, setDone] = useState(false)
@@ -22,7 +23,8 @@ function SignupForm() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!childName || !interest || !email) {
+    const finalInterest = interest === 'Something else…' ? customInterest.trim() : interest
+    if (!childName || !finalInterest || !email) {
       setError('Fill in all three fields to continue.')
       return
     }
@@ -48,7 +50,7 @@ function SignupForm() {
         const res = await fetch('/api/subscribe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ childName, interest, email })
+          body: JSON.stringify({ childName, interest: finalInterest, email })
         })
         const data = await res.json()
         if (data.success) {
@@ -117,7 +119,7 @@ function SignupForm() {
               What does {childName || 'your child'} love most?
             </label>
             <div className="flex flex-wrap gap-2">
-              {INTERESTS.map(i => (
+              {[...INTERESTS, 'Something else…'].map(i => (
                 <button
                   key={i}
                   type="button"
@@ -132,6 +134,16 @@ function SignupForm() {
                 </button>
               ))}
             </div>
+            {interest === 'Something else…' && (
+              <input
+                type="text"
+                value={customInterest}
+                onChange={e => setCustomInterest(e.target.value)}
+                placeholder="What do they love? (e.g. Minecraft, ballet, sharks…)"
+                className="mt-3 w-full px-4 py-3 border border-[#ddd] rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[#E8A838] text-[#2C2A26]"
+                autoFocus
+              />
+            )}
           </div>
 
           <div>

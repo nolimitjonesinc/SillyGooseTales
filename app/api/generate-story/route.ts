@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
 
   // Fetch subscriber + preferences
   const { data: prefs, error } = await supabaseAdmin
-    .from('storydrop_preferences')
+    .from('sillytales_preferences')
     .select('*')
     .eq('subscriber_id', subscriberId)
     .single()
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
   if (error || !prefs) return NextResponse.json({ error: 'Preferences not found' }, { status: 404 })
 
   const { data: sub } = await supabaseAdmin
-    .from('storydrop_subscribers')
+    .from('sillytales_subscribers')
     .select('subscription_status')
     .eq('id', subscriberId)
     .single()
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
 
   // Rate limit: max 1 story per 23 hours
   const { count } = await supabaseAdmin
-    .from('storydrop_story_queue')
+    .from('sillytales_story_queue')
     .select('*', { count: 'exact', head: true })
     .eq('subscriber_id', subscriberId)
     .gte('created_at', new Date(Date.now() - 23 * 60 * 60 * 1000).toISOString())
@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ dryRun: true, story })
       }
 
-      await supabaseAdmin.from('storydrop_story_queue').insert({
+      await supabaseAdmin.from('sillytales_story_queue').insert({
         subscriber_id: subscriberId,
         story_title: story.title,
         story_body: story.body,
@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
 
       // Update next_delivery_at on preferences
       await supabaseAdmin
-        .from('storydrop_preferences')
+        .from('sillytales_preferences')
         .update({ next_delivery_at: deliveryAt })
         .eq('subscriber_id', subscriberId)
 
@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
 
   // All attempts failed — flag for admin
   if (lastStory && lastQCScore) {
-    await supabaseAdmin.from('storydrop_story_queue').insert({
+    await supabaseAdmin.from('sillytales_story_queue').insert({
       subscriber_id: subscriberId,
       story_title: lastStory.title,
       story_body: lastStory.body,

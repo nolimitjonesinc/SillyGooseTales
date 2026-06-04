@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
 
   // Check if already exists
   const { data: existing } = await supabaseAdmin
-    .from('storydrop_subscribers')
+    .from('sillytales_subscribers')
     .select('id, subscription_status')
     .eq('email', email.toLowerCase())
     .single()
@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
   } else {
     // Create subscriber
     const { data: newSub, error } = await supabaseAdmin
-      .from('storydrop_subscribers')
+      .from('sillytales_subscribers')
       .insert({
         email: email.toLowerCase(),
         subscription_status: 'free_trial'
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
 
   // Create minimal preferences
   await supabaseAdmin
-    .from('storydrop_preferences')
+    .from('sillytales_preferences')
     .upsert({
       subscriber_id: subscriberId,
       child_name: childName,

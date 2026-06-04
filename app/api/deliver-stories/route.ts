@@ -13,7 +13,7 @@ export async function GET() {
 
   // Find due stories (getNextQueueItem pattern from Mockingbird)
   const { data: dueStories, error } = await supabaseAdmin
-    .from('storydrop_story_queue')
+    .from('sillytales_story_queue')
     .select('*')
     .lte('delivery_at', now)
     .eq('status', 'queued')
@@ -30,21 +30,21 @@ export async function GET() {
     try {
       // Get subscriber email + preferences
       const { data: sub } = await supabaseAdmin
-        .from('storydrop_subscribers')
+        .from('sillytales_subscribers')
         .select('id, email, subscription_status')
         .eq('id', story.subscriber_id)
         .single()
 
       if (!sub || sub.subscription_status !== 'active') {
         await supabaseAdmin
-          .from('storydrop_story_queue')
+          .from('sillytales_story_queue')
           .update({ status: 'failed' })
           .eq('id', story.id)
         continue
       }
 
       const { data: prefs } = await supabaseAdmin
-        .from('storydrop_preferences')
+        .from('sillytales_preferences')
         .select('child_name, child_age, delivery_day, delivery_slot, timezone')
         .eq('subscriber_id', story.subscriber_id)
         .single()
@@ -57,7 +57,7 @@ export async function GET() {
 
       if (process.env.SILLYTALES_DRY_RUN === 'true') {
         console.log('[DRY RUN] Would send:', story.story_title, 'to', sub.email)
-        await supabaseAdmin.from('storydrop_story_queue').update({ status: 'delivered' }).eq('id', story.id)
+        await supabaseAdmin.from('sillytales_story_queue').update({ status: 'delivered' }).eq('id', story.id)
         delivered++
         continue
       }
@@ -85,12 +85,12 @@ export async function GET() {
 
       // Mark delivered
       await supabaseAdmin
-        .from('storydrop_story_queue')
+        .from('sillytales_story_queue')
         .update({ status: 'delivered' })
         .eq('id', story.id)
 
       // Log delivery
-      await supabaseAdmin.from('storydrop_delivery_log').insert({
+      await supabaseAdmin.from('sillytales_delivery_log').insert({
         subscriber_id: story.subscriber_id,
         story_queue_id: story.id,
         story_title: story.story_title,
@@ -101,7 +101,7 @@ export async function GET() {
 
       // Update story_history (keep last 10)
       const { data: currentPrefs } = await supabaseAdmin
-        .from('storydrop_preferences')
+        .from('sillytales_preferences')
         .select('story_history')
         .eq('subscriber_id', story.subscriber_id)
         .single()
@@ -112,7 +112,7 @@ export async function GET() {
       // Schedule next delivery and update history
       const nextDelivery = calculateNextDeliveryAt(prefs.timezone, prefs.delivery_day, prefs.delivery_slot)
       await supabaseAdmin
-        .from('storydrop_preferences')
+        .from('sillytales_preferences')
         .update({
           story_history: updatedHistory,
           next_delivery_at: nextDelivery.toISOString()
@@ -128,7 +128,7 @@ export async function GET() {
       if (newRetryCount >= 3) {
         // Abandon — alert admin
         await supabaseAdmin
-          .from('storydrop_story_queue')
+          .from('sillytales_story_queue')
           .update({ status: 'failed', retry_count: newRetryCount })
           .eq('id', story.id)
 
@@ -140,7 +140,7 @@ export async function GET() {
         })
       } else {
         await supabaseAdmin
-          .from('storydrop_story_queue')
+          .from('sillytales_story_queue')
           .update({ retry_count: newRetryCount })
           .eq('id', story.id)
       }
