@@ -11,7 +11,7 @@ const TAGLINES = [
   "They want a story. You want sleep. Done.",
 ]
 
-export default function LandingPage() {
+export default function LandingPageV2() {
   const [name, setName] = useState('')
   const [taglineIndex, setTaglineIndex] = useState(0)
   const [visible, setVisible] = useState(true)
@@ -42,29 +42,30 @@ export default function LandingPage() {
           <Image
             src="/logo.png"
             alt="Silly Goose Tales"
-            width={110}
-            height={110}
+            width={90}
+            height={90}
             className="rounded-2xl"
             priority
           />
         </div>
+
         <p className="text-[#E8A838] text-xs font-semibold tracking-[0.2em] uppercase mb-6">
           Silly Goose Tales
         </p>
 
+        {/* Dynamic headline */}
         <h1
-          className="text-4xl font-bold text-[#2C2A26] leading-tight mb-4"
+          className="text-4xl font-bold text-[#2C2A26] leading-tight mb-6 transition-all duration-200"
           style={{ fontFamily: 'Georgia, serif' }}
         >
-          Bedtime stories for your silly goose. Every night.
+          {firstName
+            ? <>{firstName}&apos;s story is waiting.</>
+            : <>A story written just for them, every week.</>
+          }
         </h1>
 
-        <p className="text-base text-[#5a5550] mb-6 leading-relaxed">
-          No app. No login. Just a story waddling into your inbox.
-        </p>
-
-        {/* Name input */}
-        <div className="mb-4">
+        {/* Name input — the first thing to interact with */}
+        <div className="mb-5">
           <input
             type="text"
             value={name}
@@ -74,7 +75,7 @@ export default function LandingPage() {
           />
         </div>
 
-        {/* CTA */}
+        {/* CTA — personalizes with name */}
         <Link
           href={signupHref}
           className="inline-block w-full bg-[#E8A838] text-white text-base font-semibold px-8 py-4 rounded-xl hover:bg-[#d4952d] transition-colors"
@@ -88,14 +89,14 @@ export default function LandingPage() {
 
         {/* Rotating tagline */}
         <p
-          className="text-sm text-[#5a5550] italic mt-6 transition-opacity duration-400 min-h-[1.5rem] bg-[#EDE4D8] px-4 py-2 rounded-full inline-block"
+          className="text-sm text-[#5a5550] italic mt-6 bg-[#EDE4D8] px-4 py-2 rounded-full inline-block min-h-[1.5rem] transition-opacity duration-400"
           style={{ opacity: visible ? 1 : 0 }}
         >
           {TAGLINES[taglineIndex]}
         </p>
       </section>
 
-      {/* Story preview */}
+      {/* Story preview — name updates live */}
       <section className="max-w-lg mx-auto px-6 pb-10">
         <div className="bg-white rounded-2xl border border-[#e8ddd0] px-7 py-7 shadow-sm">
           <p className="text-[#bbb] text-xs tracking-widest uppercase mb-3">
@@ -144,7 +145,9 @@ export default function LandingPage() {
         >
           Simple pricing
         </h2>
-        <p className="text-center text-[#5a5550] text-xs mb-6">One new story every night, delivered to your inbox.</p>
+        <p className="text-center text-[#5a5550] text-xs mb-6">
+          One new story every week, delivered to your inbox.
+        </p>
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-white border border-[#e8ddd0] rounded-2xl p-6 text-center">
             <p className="text-[#5a5550] text-xs mb-1">Monthly</p>
