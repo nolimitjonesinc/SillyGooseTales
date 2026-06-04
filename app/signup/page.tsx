@@ -227,7 +227,7 @@ function SignupForm() {
             disabled={loading}
             className="w-full bg-[#E8A838] text-white text-lg font-semibold py-4 rounded-xl hover:bg-[#d4952d] transition-colors disabled:opacity-60"
           >
-            {loading ? ‘One moment…’ : plan ? ‘Continue to payment →’ : childName ? `Send ${childName}’s story tonight →` : ‘Send tonight’s story →’}
+            {loading ? 'One moment…' : plan ? 'Continue to payment →' : childName ? ('Send ' + childName + "'s story tonight →") : "Send tonight's story →"}
           </button>
         </form>
       </div>
