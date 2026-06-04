@@ -27,6 +27,14 @@ WORD COUNT: Write between ${minWords} and ${maxWords} words. This is a hard ceil
 Return only the story text with the title on the very first line, then a blank line, then the story. No labels, no commentary.`
 }
 
+const MOOD_DIRECTIVES: Record<string, string> = {
+  happy: `Tonight's mood: the child is happy and content. Lean into joy, warmth, and celebration. The story should feel like a good day getting even better.`,
+  sleepy: `Tonight's mood: the child is sleepy and winding down. Keep the story calm, cozy, and slow. Every sentence should feel like a warm blanket. End with stillness.`,
+  silly: `Tonight's mood: the child is in a silly, giggly mood. Lean hard into absurdity and humor. At least two genuinely funny moments. Maximum goofiness, minimum logic.`,
+  excited: `Tonight's mood: the child is buzzing with excitement. Channel that energy — the story moves fast, the stakes feel real, the ending is triumphant.`,
+  anxious: `Tonight's mood: the child is feeling anxious or worried. Write a story where the protagonist faces a similar worry and discovers it is smaller than it seemed. Gentle and reassuring. No jump scares, no unresolved tension.`,
+}
+
 function buildPersonalizationBlock(prefs: Preferences): string {
   const interests = prefs.interests.join(', ')
   const excludes = prefs.themes_exclude.length > 0
@@ -38,11 +46,12 @@ function buildPersonalizationBlock(prefs: Preferences): string {
   const character = prefs.character_state
     ? `\nThe story features a returning character: ${prefs.character_state.name}, a ${prefs.character_state.type} who ${prefs.character_state.quirk}. Last time: ${prefs.character_state.last_event}.`
     : ''
+  const mood = prefs.mood ? `\n\n${MOOD_DIRECTIVES[prefs.mood]}` : ''
 
   return `PERSONALIZATION:
 The child's name is ${prefs.child_name}, age ${prefs.child_age}. They love ${interests}.
 The child's stated interest (${interests}) must be load-bearing to the plot — it should be the reason the problem gets solved, not just mentioned in passing.
-Use the child's name naturally in the first sentence (in action), at the emotional peak, and in the closing image. Maximum 3 appearances total.${excludes}${history}${character}`
+Use the child's name naturally in the first sentence (in action), at the emotional peak, and in the closing image. Maximum 3 appearances total.${excludes}${history}${character}${mood}`
 }
 
 export async function generateStory(prefs: Preferences): Promise<{ title: string; body: string }> {

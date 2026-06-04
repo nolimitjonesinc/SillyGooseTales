@@ -51,6 +51,7 @@ export type Preferences = {
   themes_include: string[]
   themes_exclude: string[]
   tone_profile: string
+  mood: 'happy' | 'sleepy' | 'silly' | 'excited' | 'anxious' | null
   delivery_day: string
   delivery_slot: 'morning' | 'afternoon' | 'evening'
   timezone: string

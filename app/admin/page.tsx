@@ -32,7 +32,7 @@ export default async function AdminPage() {
     <main className="min-h-screen bg-[#FDF6EE] p-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold text-[#2C2A26] mb-8" style={{ fontFamily: 'Georgia, serif' }}>
-          Story Drop — Admin
+          Silly Goose Tales — Admin
         </h1>
 
         {/* Stats grid */}

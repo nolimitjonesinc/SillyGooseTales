@@ -7,7 +7,7 @@ export default function LandingPage() {
       {/* Hero */}
       <section className="max-w-2xl mx-auto px-6 pt-24 pb-16 text-center">
         <p className="text-[#E8A838] text-sm font-medium tracking-widest uppercase mb-6">
-          Story Drop
+          Silly Goose Tales
         </p>
         <h1 className="text-5xl font-bold text-[#2C2A26] leading-tight mb-6"
           style={{ fontFamily: 'Georgia, serif' }}>
@@ -87,7 +87,7 @@ export default function LandingPage() {
       </section>
 
       <footer className="border-t border-[#e8ddd0] py-8 text-center">
-        <p className="text-[#ccc] text-sm">Story Drop · Made with care for curious kids</p>
+        <p className="text-[#ccc] text-sm">Silly Goose Tales · Made with care for curious kids</p>
       </footer>
     </main>
   )

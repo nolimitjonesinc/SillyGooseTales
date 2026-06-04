@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
     if (qcScore.passed) {
       passed = true
 
-      if (process.env.STORYDROP_DRY_RUN === 'true') {
+      if (process.env.SILLYTALES_DRY_RUN === 'true') {
         console.log('[DRY RUN] Would queue story:', story.title, 'for', deliveryAt)
         return NextResponse.json({ dryRun: true, story })
       }
@@ -102,7 +102,7 @@ export async function POST(req: NextRequest) {
     await getResend().emails.send({
       from: `${process.env.RESEND_FROM_NAME} <${process.env.RESEND_FROM_EMAIL}>`,
       to: process.env.ADMIN_EMAIL!,
-      subject: `Story Drop: QC failed for subscriber ${subscriberId}`,
+      subject: `Silly Goose Tales: QC failed for subscriber ${subscriberId}`,
       text: `A story for subscriber ${subscriberId} failed QC ${MAX_QC_RETRIES} times and has been flagged for review.\n\nFailure notes: ${lastQCScore.failure_notes}\n\nReview at: ${process.env.NEXT_PUBLIC_APP_URL}/admin/review`
     })
   }

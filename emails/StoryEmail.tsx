@@ -9,6 +9,7 @@ interface StoryEmailProps {
   preferencesUrl: string
   pauseUrl: string
   unsubUrl: string
+  moodBaseUrl: string
 }
 
 // Near-plain-text template — designed for Gmail Primary placement
@@ -20,7 +21,8 @@ export function StoryEmail({
   storyBody,
   preferencesUrl,
   pauseUrl,
-  unsubUrl
+  unsubUrl,
+  moodBaseUrl
 }: StoryEmailProps) {
   const dayOfWeek = new Date().toLocaleDateString('en-US', { weekday: 'long' })
 
@@ -90,6 +92,29 @@ export function StoryEmail({
             fontFamily: 'Georgia, serif'
           }}>
             {storyTitle}
+          </Text>
+
+          {/* Mood selector — one-tap for next story */}
+          <Text style={{
+            fontSize: '13px',
+            color: '#888888',
+            textAlign: 'center' as const,
+            margin: '0 0 8px 0',
+            fontFamily: 'Arial, sans-serif'
+          }}>
+            How is {childName} feeling tonight?
+          </Text>
+          <Text style={{
+            fontSize: '20px',
+            textAlign: 'center' as const,
+            margin: '0 0 32px 0',
+            lineHeight: '1.8'
+          }}>
+            <Link href={`${moodBaseUrl}&mood=happy`} style={{ textDecoration: 'none', marginRight: '8px' }}>😄</Link>
+            <Link href={`${moodBaseUrl}&mood=sleepy`} style={{ textDecoration: 'none', marginRight: '8px' }}>😴</Link>
+            <Link href={`${moodBaseUrl}&mood=silly`} style={{ textDecoration: 'none', marginRight: '8px' }}>🤪</Link>
+            <Link href={`${moodBaseUrl}&mood=excited`} style={{ textDecoration: 'none', marginRight: '8px' }}>🤩</Link>
+            <Link href={`${moodBaseUrl}&mood=anxious`} style={{ textDecoration: 'none' }}>🤗</Link>
           </Text>
 
           {/* Footer — 3 lines only */}

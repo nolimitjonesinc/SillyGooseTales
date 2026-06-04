@@ -55,7 +55,7 @@ export async function GET() {
       const magicToken = await generateMagicToken(sub.id)
       const baseUrl = process.env.NEXT_PUBLIC_APP_URL!
 
-      if (process.env.STORYDROP_DRY_RUN === 'true') {
+      if (process.env.SILLYTALES_DRY_RUN === 'true') {
         console.log('[DRY RUN] Would send:', story.story_title, 'to', sub.email)
         await supabaseAdmin.from('storydrop_story_queue').update({ status: 'delivered' }).eq('id', story.id)
         delivered++
@@ -76,7 +76,8 @@ export async function GET() {
           storyBody: story.story_body,
           preferencesUrl: `${baseUrl}/preferences?token=${magicToken}`,
           pauseUrl: `${baseUrl}/pause?token=${magicToken}`,
-          unsubUrl: `${baseUrl}/unsubscribe?token=${magicToken}`
+          unsubUrl: `${baseUrl}/unsubscribe?token=${magicToken}`,
+          moodBaseUrl: `${baseUrl}/api/set-mood?token=${magicToken}`
         })
       })
 
@@ -134,7 +135,7 @@ export async function GET() {
         await getResend().emails.send({
           from: `${process.env.RESEND_FROM_NAME} <${process.env.RESEND_FROM_EMAIL}>`,
           to: process.env.ADMIN_EMAIL!,
-          subject: `Story Drop: delivery failed 3x for subscriber ${story.subscriber_id}`,
+          subject: `Silly Goose Tales: delivery failed 3x for subscriber ${story.subscriber_id}`,
           text: `Story "${story.story_title}" failed to deliver after 3 attempts.\nSubscriber: ${story.subscriber_id}\nStory ID: ${story.id}`
         })
       } else {

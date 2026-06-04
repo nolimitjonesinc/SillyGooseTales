@@ -49,7 +49,7 @@ export async function GET() {
 
   const allGood = failed === 0 && flagged === 0 && (atRiskCount ?? 0) === 0
 
-  const emailText = `Story Drop — Weekly Health ${dateStr}
+  const emailText = `Silly Goose Tales — Weekly Health ${dateStr}
 
 📬 Delivery: ${successRate}% success (${delivered} delivered, ${failed} failed, ${bounced} bounced)
 ⭐ Story quality: ${flagged === 0 ? 'All stories passed QC' : `${flagged} flagged for review`}${regenerated > 0 ? ` (${regenerated} needed regeneration)` : ''}
@@ -57,10 +57,10 @@ export async function GET() {
 🚩 Flagged stories needing review: ${flagged}${flagged > 0 ? ` → ${appUrl}/admin/review` : ''}
 ⚠️  Failures: ${failed + bounced > 0 ? `${failed} delivery failures, ${bounced} bounces this week` : 'None'}
 
-${allGood ? 'Everything looks clean. Story Drop is humming.' : `Action needed → ${appUrl}/admin`}
+${allGood ? 'Everything looks clean. Silly Goose Tales is humming.' : `Action needed → ${appUrl}/admin`}
 `
 
-  if (process.env.STORYDROP_DRY_RUN === 'true') {
+  if (process.env.SILLYTALES_DRY_RUN === 'true') {
     console.log('[DRY RUN] Health digest:', emailText)
     return NextResponse.json({ dryRun: true })
   }
@@ -68,7 +68,7 @@ ${allGood ? 'Everything looks clean. Story Drop is humming.' : `Action needed �
   await getResend().emails.send({
     from: `${process.env.RESEND_FROM_NAME} <${process.env.RESEND_FROM_EMAIL}>`,
     to: process.env.ADMIN_EMAIL!,
-    subject: `Story Drop — Weekly Health ${dateStr}`,
+    subject: `Silly Goose Tales — Weekly Health ${dateStr}`,
     text: emailText
   })
 

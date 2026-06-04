@@ -76,7 +76,7 @@ function SignupForm() {
             {childName}&apos;s first story is on its way. It should arrive this evening — ready to read at bedtime.
           </p>
           <p className="text-[#aaa] text-sm mt-6">
-            Check your spam folder if you don&apos;t see it — or better yet, add Maya at Story Drop to your contacts.
+            Check your spam folder if you don&apos;t see it — or better yet, add Maya at Silly Goose Tales to your contacts.
           </p>
         </div>
       </main>

@@ -307,13 +307,13 @@ export default function OnboardingWizard() {
               <div className="pt-8">
                 <h2 className="text-2xl font-semibold text-[#2C2A26] mb-3">One last step</h2>
                 <p className="text-[#5a5550] text-lg mb-8 leading-relaxed">
-                  Add Story Drop to your contacts so the story always finds its way to bedtime.
+                  Add Silly Goose Tales to your contacts so the story always finds its way to bedtime.
                 </p>
                 <div className="bg-white border border-[#e8ddd0] rounded-2xl p-6 mb-8 space-y-6">
                   <div>
                     <p className="font-semibold text-[#2C2A26] mb-2">📱 iPhone (Apple Mail)</p>
                     <ol className="text-[#5a5550] text-sm space-y-1 list-decimal list-inside">
-                      <li>Open the confirmation email from Maya at Story Drop</li>
+                      <li>Open the confirmation email from Maya at Silly Goose Tales</li>
                       <li>Tap the sender name</li>
                       <li>Tap &quot;Create New Contact&quot;</li>
                     </ol>
@@ -321,7 +321,7 @@ export default function OnboardingWizard() {
                   <div>
                     <p className="font-semibold text-[#2C2A26] mb-2">📬 Gmail</p>
                     <ol className="text-[#5a5550] text-sm space-y-1 list-decimal list-inside">
-                      <li>Open any email from Story Drop</li>
+                      <li>Open any email from Silly Goose Tales</li>
                       <li>Hover the sender name</li>
                       <li>Click &quot;Add to contacts&quot;</li>
                     </ol>
