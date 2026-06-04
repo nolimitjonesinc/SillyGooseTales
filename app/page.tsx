@@ -48,7 +48,7 @@ export default function LandingPage() {
             priority
           />
         </div>
-        <p className="text-[#E8A838] text-xs font-semibold tracking-[0.2em] uppercase mb-6">
+        <p className="text-[#E8A838] text-sm font-semibold tracking-[0.2em] uppercase mb-6">
           Silly Goose Tales
         </p>
 
