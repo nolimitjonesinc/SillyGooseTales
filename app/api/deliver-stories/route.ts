@@ -35,7 +35,7 @@ export async function GET() {
         .eq('id', story.subscriber_id)
         .single()
 
-      if (!sub || sub.subscription_status !== 'active') {
+      if (!sub || !['active', 'free_trial'].includes(sub.subscription_status)) {
         await supabaseAdmin
           .from('sillytales_story_queue')
           .update({ status: 'failed' })

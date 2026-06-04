@@ -13,12 +13,12 @@ export default async function AdminPage() {
     { data: flaggedStories },
     { count: queuedCount }
   ] = await Promise.all([
-    supabaseAdmin.from('storydrop_subscribers').select('*', { count: 'exact', head: true }).eq('subscription_status', 'active'),
-    supabaseAdmin.from('storydrop_subscribers').select('*', { count: 'exact', head: true }).eq('subscription_status', 'at_risk'),
-    supabaseAdmin.from('storydrop_subscribers').select('*', { count: 'exact', head: true }),
-    supabaseAdmin.from('storydrop_delivery_log').select('status, email_opened').gte('created_at', sevenDaysAgo),
-    supabaseAdmin.from('storydrop_story_queue').select('id, subscriber_id, story_title, qc_score, created_at').eq('status', 'flagged').order('created_at', { ascending: false }).limit(20),
-    supabaseAdmin.from('storydrop_story_queue').select('*', { count: 'exact', head: true }).eq('status', 'queued'),
+    supabaseAdmin.from('sillytales_subscribers').select('*', { count: 'exact', head: true }).eq('subscription_status', 'active'),
+    supabaseAdmin.from('sillytales_subscribers').select('*', { count: 'exact', head: true }).eq('subscription_status', 'at_risk'),
+    supabaseAdmin.from('sillytales_subscribers').select('*', { count: 'exact', head: true }),
+    supabaseAdmin.from('sillytales_delivery_log').select('status, email_opened').gte('created_at', sevenDaysAgo),
+    supabaseAdmin.from('sillytales_story_queue').select('id, subscriber_id, story_title, qc_score, created_at').eq('status', 'flagged').order('created_at', { ascending: false }).limit(20),
+    supabaseAdmin.from('sillytales_story_queue').select('*', { count: 'exact', head: true }).eq('status', 'queued'),
   ])
 
   const delivered = recentLogs?.filter(l => l.status === 'delivered').length ?? 0
