@@ -111,7 +111,9 @@ function SignupForm() {
             {plan ? `Start ${plan} plan` : "Let’s write tonight’s story."}
           </h1>
           <p className="text-[#5a5550]">
-            {plan ? "Set up your child’s stories in under a minute." : ‘Free story tonight, then one every night after you subscribe. Takes 90 seconds to set up.’}
+            {plan
+              ? "Set up your child’s stories in under a minute."
+              : "Free story tonight, then one every night after you subscribe. Takes 90 seconds to set up."}
           </p>
         </div>
 
