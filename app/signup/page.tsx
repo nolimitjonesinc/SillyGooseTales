@@ -108,11 +108,11 @@ function SignupForm() {
 
         <div className="text-center mb-10">
           <h1 className="text-3xl font-bold text-[#2C2A26] mb-3" style={{ fontFamily: 'Georgia, serif' }}>
-            {plan ? `Start ${plan} plan` : "Let’s write tonight’s story."}
+            {plan ? `Start ${plan} plan` : "Let's write tonight's story."}
           </h1>
           <p className="text-[#5a5550]">
             {plan
-              ? "Set up your child’s stories in under a minute."
+              ? "Set up your child's stories in under a minute."
               : "Free story tonight, then one every night after you subscribe. Takes 90 seconds to set up."}
           </p>
         </div>
