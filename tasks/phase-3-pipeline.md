@@ -82,6 +82,21 @@
 
 ---
 
+### Story Page + PDF
+
+- [x] Migration 003 — add `story_token` (uuid, unique) and `illustration_url` to `sillytales_story_queue`
+- [x] Build `/story/[token]` — public server-rendered story page (no login, secret URL)
+  - Illustration at top (renders when `illustration_url` is present)
+  - Full story in Georgia serif, amber title, warm off-white background
+  - "Save as PDF" button (top-right, hidden on print, uses window.print())
+  - Upsell section (free users only) — annual card dominant, links to Stripe checkout
+- [x] Update `emails/StoryEmail.tsx` — teaser format (title + 2 paragraphs + CTA button → story page)
+- [x] Update `deliver-stories` — builds story page URL from token, passes teaser to email
+- [x] Update `generate-story` — generates and stores `story_token` on queue insert
+- [ ] Image generation — DALL-E 3 integration, build prompt from story scene + Version B style formula
+
+---
+
 ## Done When
 
 A story generates automatically, passes QC, enters the queue, and arrives in a real Gmail Primary inbox at the correct local time with the child's name in the subject line. The admin review page is live. The weekly health digest fires on Monday.
