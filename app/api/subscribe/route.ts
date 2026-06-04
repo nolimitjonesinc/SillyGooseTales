@@ -60,6 +60,18 @@ export async function POST(req: NextRequest) {
   // Tonight delivery — find next evening slot
   const deliveryAt = calculateNextDeliveryAt(timezone, new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase(), 'evening')
 
+  // Fetch existing interests so custom ones accumulate over time
+  const { data: existingPrefs } = await supabaseAdmin
+    .from('sillytales_preferences')
+    .select('interests')
+    .eq('subscriber_id', subscriberId)
+    .single()
+
+  const existingInterests: string[] = existingPrefs?.interests ?? []
+  const updatedInterests = existingInterests.includes(interest)
+    ? existingInterests
+    : [...existingInterests, interest]
+
   // Create minimal preferences
   await supabaseAdmin
     .from('sillytales_preferences')
@@ -67,7 +79,7 @@ export async function POST(req: NextRequest) {
       subscriber_id: subscriberId,
       child_name: childName,
       child_age: childAge,
-      interests: [interest],
+      interests: updatedInterests,
       tone_profile: toneProfile,
       delivery_day: new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase(),
       delivery_slot: 'evening',

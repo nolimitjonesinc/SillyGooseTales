@@ -3,10 +3,10 @@ import { useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 
 const AGE_RANGES = [
-  { label: '3 – 4', value: 4 },
-  { label: '5 – 6', value: 6 },
-  { label: '7 – 8', value: 8 },
-  { label: '9 – 10', value: 10 },
+  { label: '2 – 4', value: 3 },
+  { label: '5 – 7', value: 6 },
+  { label: '8 – 10', value: 9 },
+  { label: '11 – 12', value: 11 },
 ]
 
 const INTERESTS = [
