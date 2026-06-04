@@ -52,12 +52,12 @@ export default function LandingPage() {
           className="text-4xl font-bold text-[#2C2A26] leading-tight mb-4"
           style={{ fontFamily: 'Georgia, serif' }}
         >
-          Bedtime stories,<br />written for your kid,<br />emailed tonight.
+          Bedtime stories written for your silly goose, emailed every night.
         </h1>
 
         {/* Subhead */}
         <p className="text-base text-[#5a5550] mb-8 leading-relaxed">
-          No app. No login. A new personalized story in your inbox every night.
+          No app. No login. Just a fresh story waddling into your inbox every night.
         </p>
 
         {/* CTA */}
