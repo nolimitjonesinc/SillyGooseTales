@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
 
   // Trigger a sample story immediately
   const appUrl = process.env.NEXT_PUBLIC_APP_URL!
-  const sampleDelivery = new Date(Date.now() + 5 * 60 * 1000) // 5 minutes from now
+  const sampleDelivery = new Date()
 
   fetch(`${appUrl}/api/generate-story`, {
     method: 'POST',
