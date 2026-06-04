@@ -91,8 +91,15 @@ export default function LandingPage() {
             >
               How is Emma feeling tonight?
             </p>
-            <div className="flex justify-center gap-6 text-3xl">
-              <span>😄</span><span>😴</span><span>🤪</span><span>🤩</span><span>🤗</span>
+            <div className="flex justify-center gap-3 flex-wrap">
+              {['Happy', 'Sleepy', 'Silly', 'Excited', 'Cozy'].map(mood => (
+                <span
+                  key={mood}
+                  className="px-4 py-1.5 rounded-full border border-[#e8ddd0] text-sm text-[#5a5550] bg-[#fdf6ee]"
+                >
+                  {mood}
+                </span>
+              ))}
             </div>
           </div>
         </div>
@@ -111,19 +118,19 @@ export default function LandingPage() {
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 text-center">
           <div>
-            <p className="text-3xl mb-4">✍️</p>
+            <p className="text-sm font-bold text-[#E8A838] tracking-widest mb-4">01</p>
             <p className="font-semibold text-[#2C2A26] mb-2">Tell us about your kid</p>
             <p className="text-[#5a5550] text-sm leading-relaxed">Name, age, what they love, and the vibe you want at bedtime. Two minutes.</p>
           </div>
           <div>
-            <p className="text-3xl mb-4">📬</p>
+            <p className="text-sm font-bold text-[#E8A838] tracking-widest mb-4">02</p>
             <p className="font-semibold text-[#2C2A26] mb-2">Stories land in your inbox</p>
             <p className="text-[#5a5550] text-sm leading-relaxed">One story every week on the day you choose. Their interests aren&apos;t decoration — they drive the whole plot.</p>
           </div>
           <div>
-            <p className="text-3xl mb-4">😄</p>
-            <p className="font-semibold text-[#2C2A26] mb-2">Tap a mood. Next story adapts.</p>
-            <p className="text-[#5a5550] text-sm leading-relaxed">After every story, five emojis. One tap. Next week starts from where your kid actually is.</p>
+            <p className="text-sm font-bold text-[#E8A838] tracking-widest mb-4">03</p>
+            <p className="font-semibold text-[#2C2A26] mb-2">Pick a mood. Next story adapts.</p>
+            <p className="text-[#5a5550] text-sm leading-relaxed">After every story, five moods. One tap. Next week starts from where your kid actually is.</p>
           </div>
         </div>
       </section>
