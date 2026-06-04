@@ -103,14 +103,38 @@ function SignupForm() {
               Like what&apos;s coming?
             </p>
             <p className="text-[#aaa] text-sm mb-4">
-              Lock in a new story every single night for $9.99/month. Each one builds on the last.
+              Lock in a new story every week. Each one builds on the last.
             </p>
-            <a
-              href="/signup?plan=monthly"
-              className="block w-full bg-[#E8A838] text-white text-sm font-semibold py-3 rounded-xl hover:bg-[#d4952d] transition-colors text-center"
-            >
-              Get nightly stories — $9.99/mo
-            </a>
+            <div className="space-y-2">
+              <button
+                onClick={async () => {
+                  const res = await fetch('/api/checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, plan: 'annual' })
+                  })
+                  const { url } = await res.json()
+                  if (url) window.location.href = url
+                }}
+                className="block w-full bg-[#E8A838] text-white text-sm font-semibold py-3 rounded-xl hover:bg-[#d4952d] transition-colors text-center"
+              >
+                Best deal — $89.99/year ($7.50/mo)
+              </button>
+              <button
+                onClick={async () => {
+                  const res = await fetch('/api/checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, plan: 'monthly' })
+                  })
+                  const { url } = await res.json()
+                  if (url) window.location.href = url
+                }}
+                className="block w-full bg-transparent border border-[#444] text-[#aaa] text-sm py-3 rounded-xl hover:border-[#E8A838] hover:text-white transition-colors text-center"
+              >
+                Monthly — $9.99/mo
+              </button>
+            </div>
           </div>
 
           <div className="bg-white border border-[#e8ddd0] rounded-2xl p-5 mb-4">
