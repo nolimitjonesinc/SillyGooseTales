@@ -196,7 +196,7 @@ export default function OnboardingWizard() {
             {step === 1 && (
               <div className="text-center pt-16">
                 <h1 className="text-4xl font-bold text-[#2C2A26] mb-4" style={{ fontFamily: 'Georgia, serif' }}>
-                  A story. Every week. Just for them.
+                  A story. Every day. Just for them.
                 </h1>
                 <p className="text-[#5a5550] text-lg mb-12">Let&apos;s set it up — takes about 2 minutes.</p>
                 <button onClick={() => setStep(2)}
