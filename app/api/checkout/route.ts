@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
     },
     productOptions: {
       redirectUrl: `${appUrl}/onboarding?subscriber_id=${subId}`,
-      receiptLinkUrl: `${appUrl}/onboarding?subscriber_id=${subId}`,
+      receiptLinkUrl: `${appUrl}/`,
     }
   })
 
