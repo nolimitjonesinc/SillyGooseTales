@@ -45,18 +45,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  // Trigger a sample story immediately
+  // Trigger a welcome story — awaited so Vercel doesn't kill it before it completes
   const appUrl = process.env.NEXT_PUBLIC_APP_URL!
-  const sampleDelivery = new Date()
-
-  fetch(`${appUrl}/api/generate-story`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      subscriberId,
-      overrideDeliveryAt: sampleDelivery.toISOString()
+  try {
+    await fetch(`${appUrl}/api/generate-story`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        subscriberId,
+        overrideDeliveryAt: new Date().toISOString()
+      })
     })
-  }).catch(err => console.error('[onboarding] Sample story generation failed:', err))
+  } catch (err) {
+    console.error('[onboarding] Welcome story generation failed:', err)
+  }
 
   return NextResponse.json({ success: true, nextDeliveryAt: nextDeliveryAt.toISOString() })
 }

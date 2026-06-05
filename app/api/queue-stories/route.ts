@@ -48,7 +48,7 @@ export async function GET() {
     .from('sillytales_subscribers')
     .select('id, subscription_status')
     .in('id', toGenerate.map(s => s.subscriber_id))
-    .in('subscription_status', ['active'])
+    .in('subscription_status', ['active', 'free_trial'])
 
   const activeIds = new Set(activeStatuses?.map(s => s.id) ?? [])
 
