@@ -103,7 +103,7 @@ function SignupForm() {
               Like what&apos;s coming?
             </p>
             <p className="text-[#aaa] text-sm mb-4">
-              Lock in a new story every week. Each one builds on the last.
+              Lock in a new story every day. Each one builds on the last.
             </p>
             <div className="space-y-2">
               <button

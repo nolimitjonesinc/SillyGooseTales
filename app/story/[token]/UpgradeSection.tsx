@@ -47,7 +47,7 @@ export function UpgradeSection({ childName, subscriberId }: UpgradeSectionProps)
         color: '#888888',
         margin: '0 0 48px 0'
       }}>
-        There&apos;s a new story waiting every week.
+        There&apos;s a new story waiting every day.
       </p>
 
       <div style={{
@@ -190,7 +190,7 @@ export function UpgradeSection({ childName, subscriberId }: UpgradeSectionProps)
         color: '#cccccc',
         marginTop: '24px'
       }}>
-        No app. No logins. Just a story in your inbox, every week.
+        No app. No logins. Just a story in your inbox, every day.
       </p>
     </div>
   )

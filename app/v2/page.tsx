@@ -60,7 +60,7 @@ export default function LandingPageV2() {
         >
           {firstName
             ? <>{firstName}&apos;s story is waiting.</>
-            : <>A story written just for them, every week.</>
+            : <>A story written just for them, every day.</>
           }
         </h1>
 
@@ -146,7 +146,7 @@ export default function LandingPageV2() {
           Simple pricing
         </h2>
         <p className="text-center text-[#5a5550] text-xs mb-6">
-          One new story every week, delivered to your inbox.
+          One new story every day, delivered to your inbox.
         </p>
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-white border border-[#e8ddd0] rounded-2xl p-6 text-center">
