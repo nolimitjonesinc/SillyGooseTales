@@ -78,6 +78,10 @@ export type StoryQueueItem = {
   retry_count: number
   qc_score: QCScore | null
   created_at: string
+  input_tokens: number
+  output_tokens: number
+  qc_input_tokens: number
+  qc_output_tokens: number
 }
 
 export type QCScore = {

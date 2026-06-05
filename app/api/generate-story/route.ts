@@ -49,13 +49,21 @@ export async function POST(req: NextRequest) {
   ).toISOString()
 
   // Generate with QC — up to MAX_QC_RETRIES attempts
-  let lastStory: { title: string; body: string } | null = null
+  let lastStory: { title: string; body: string; inputTokens: number; outputTokens: number } | null = null
   let lastQCScore = null
   let passed = false
+  let totalInputTokens = 0
+  let totalOutputTokens = 0
+  let totalQcInputTokens = 0
+  let totalQcOutputTokens = 0
 
   for (let attempt = 0; attempt < MAX_QC_RETRIES; attempt++) {
     const story = await generateStory(prefs as Preferences)
     const qcScore = await scoreStory(story.body, prefs as Preferences)
+    totalInputTokens += story.inputTokens
+    totalOutputTokens += story.outputTokens
+    totalQcInputTokens += qcScore.inputTokens
+    totalQcOutputTokens += qcScore.outputTokens
     lastStory = story
     lastQCScore = qcScore
 
@@ -74,7 +82,11 @@ export async function POST(req: NextRequest) {
         story_token: crypto.randomUUID(),
         delivery_at: deliveryAt,
         status: 'queued',
-        qc_score: qcScore
+        qc_score: qcScore,
+        input_tokens: totalInputTokens,
+        output_tokens: totalOutputTokens,
+        qc_input_tokens: totalQcInputTokens,
+        qc_output_tokens: totalQcOutputTokens
       })
 
       // Update next_delivery_at on preferences
@@ -97,7 +109,11 @@ export async function POST(req: NextRequest) {
       delivery_at: deliveryAt,
       status: 'flagged',
       retry_count: MAX_QC_RETRIES,
-      qc_score: lastQCScore
+      qc_score: lastQCScore,
+      input_tokens: totalInputTokens,
+      output_tokens: totalOutputTokens,
+      qc_input_tokens: totalQcInputTokens,
+      qc_output_tokens: totalQcOutputTokens
     })
 
     // Alert admin

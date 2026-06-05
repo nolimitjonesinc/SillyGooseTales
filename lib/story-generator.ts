@@ -54,7 +54,7 @@ The child's stated interest (${interests}) must be load-bearing to the plot — 
 Use the child's name naturally in the first sentence (in action), at the emotional peak, and in the closing image. Maximum 3 appearances total.${excludes}${history}${character}${mood}`
 }
 
-export async function generateStory(prefs: Preferences): Promise<{ title: string; body: string }> {
+export async function generateStory(prefs: Preferences): Promise<{ title: string; body: string; inputTokens: number; outputTokens: number }> {
   const toneId = (prefs.tone_profiles?.length)
     ? prefs.tone_profiles[Math.floor(Math.random() * prefs.tone_profiles.length)]
     : prefs.tone_profile
@@ -84,5 +84,10 @@ export async function generateStory(prefs: Preferences): Promise<{ title: string
   const title = lines[0].replace(/^#\s*/, '').trim()
   const body = lines.slice(2).join('\n').trim()
 
-  return { title, body }
+  return {
+    title,
+    body,
+    inputTokens: response.usage.input_tokens,
+    outputTokens: response.usage.output_tokens
+  }
 }

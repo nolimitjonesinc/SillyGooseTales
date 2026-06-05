@@ -52,10 +52,12 @@ Return ONLY this JSON, nothing else:
 "passed" must be true only if ALL five criteria are true.`
 }
 
+export type QCResult = QCScore & { inputTokens: number; outputTokens: number }
+
 export async function scoreStory(
   storyBody: string,
   prefs: Preferences
-): Promise<QCScore> {
+): Promise<QCResult> {
   const wordCount = countWords(storyBody)
 
   try {
@@ -71,16 +73,18 @@ export async function scoreStory(
     const raw = response.content[0].type === 'text' ? response.content[0].text : '{}'
     const score = JSON.parse(raw.trim()) as QCScore
 
-    // Ensure passed is correctly set (don't trust model's calculation)
     score.passed = score.protagonist_agency &&
       score.interest_load_bearing &&
       score.no_moral_announcement &&
       score.word_count_in_range &&
       score.tone_match
 
-    return score
+    return {
+      ...score,
+      inputTokens: response.usage.input_tokens,
+      outputTokens: response.usage.output_tokens
+    }
   } catch {
-    // If QC call fails, fail safe — don't queue a potentially bad story
     return {
       protagonist_agency: false,
       interest_load_bearing: false,
@@ -88,7 +92,9 @@ export async function scoreStory(
       word_count_in_range: false,
       tone_match: false,
       passed: false,
-      failure_notes: 'QC scoring call failed — story flagged as precaution'
+      failure_notes: 'QC scoring call failed — story flagged as precaution',
+      inputTokens: 0,
+      outputTokens: 0
     }
   }
 }
