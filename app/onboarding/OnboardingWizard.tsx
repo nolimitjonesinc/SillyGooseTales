@@ -66,7 +66,6 @@ export default function OnboardingWizard() {
           } else if (data.tone_profile) {
             setTones([data.tone_profile])
           }
-          if (data.delivery_day) setDeliveryDay(data.delivery_day.charAt(0).toUpperCase() + data.delivery_day.slice(1))
           if (data.delivery_slot) setDeliverySlot(data.delivery_slot)
           if (data.timezone) setTimezone(data.timezone)
         })
