@@ -62,7 +62,7 @@ export async function scoreStory(
 
   try {
     const response = await getAnthropic().messages.create({
-      model: 'claude-haiku-3-5-20241022',
+      model: 'claude-haiku-4-5-20251001',
       max_tokens: 300,
       messages: [{
         role: 'user',

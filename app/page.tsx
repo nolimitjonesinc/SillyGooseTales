@@ -181,7 +181,11 @@ export default function LandingPage() {
       </section>
 
       <footer className="border-t border-[#e8ddd0] py-6 text-center">
-        <p className="text-[#ccc] text-xs">Silly Goose Tales · No app. No login. Just stories.</p>
+        <p className="text-[#ccc] text-xs mb-2">Silly Goose Tales · No app. No login. Just stories.</p>
+        <div className="flex justify-center gap-4 text-xs">
+          <Link href="/privacy" className="text-[#bbb] hover:text-[#E8A838] transition-colors">Privacy Policy</Link>
+          <Link href="/terms" className="text-[#bbb] hover:text-[#E8A838] transition-colors">Terms of Service</Link>
+        </div>
       </footer>
 
     </main>
