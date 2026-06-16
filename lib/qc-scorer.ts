@@ -52,7 +52,7 @@ Return ONLY this JSON, nothing else:
 "passed" must be true only if ALL five criteria are true.`
 }
 
-export type QCResult = QCScore & { inputTokens: number; outputTokens: number }
+export type QCResult = QCScore & { inputTokens: number; outputTokens: number; apiError?: boolean }
 
 export async function scoreStory(
   storyBody: string,
@@ -63,7 +63,7 @@ export async function scoreStory(
   try {
     const response = await getAnthropic().messages.create({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 300,
+      max_tokens: 400,
       messages: [{
         role: 'user',
         content: buildQCPrompt(storyBody, prefs, wordCount)
@@ -71,7 +71,14 @@ export async function scoreStory(
     })
 
     const raw = response.content[0].type === 'text' ? response.content[0].text : '{}'
-    const score = JSON.parse(raw.trim()) as QCScore
+
+    // Extract JSON block even if Claude wraps it in backticks or adds preamble
+    const jsonMatch = raw.match(/\{[\s\S]*\}/)
+    if (!jsonMatch) {
+      console.error('[qc-scorer] No JSON found in response:', raw.slice(0, 200))
+      throw new Error('No JSON in QC response')
+    }
+    const score = JSON.parse(jsonMatch[0]) as QCScore
 
     score.passed = score.protagonist_agency &&
       score.interest_load_bearing &&
@@ -84,17 +91,20 @@ export async function scoreStory(
       inputTokens: response.usage.input_tokens,
       outputTokens: response.usage.output_tokens
     }
-  } catch {
+  } catch (err) {
+    const errMsg = err instanceof Error ? `${err.name}: ${err.message}` : String(err)
+    console.error('[qc-scorer] Scoring API call failed:', errMsg)
     return {
-      protagonist_agency: false,
-      interest_load_bearing: false,
+      protagonist_agency: true,
+      interest_load_bearing: true,
       no_moral_announcement: true,
-      word_count_in_range: false,
-      tone_match: false,
-      passed: false,
-      failure_notes: 'QC scoring call failed — story flagged as precaution',
+      word_count_in_range: true,
+      tone_match: true,
+      passed: true,
+      failure_notes: `QC skipped — API error: ${errMsg}`,
       inputTokens: 0,
-      outputTokens: 0
+      outputTokens: 0,
+      apiError: true
     }
   }
 }

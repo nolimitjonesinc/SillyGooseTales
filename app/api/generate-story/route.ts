@@ -5,6 +5,9 @@ import { scoreStory } from '@/lib/qc-scorer'
 import { calculateNextDeliveryAt } from '@/lib/scheduling'
 import { getResend } from '@/lib/clients'
 import type { Preferences } from '@/lib/supabase'
+
+export const maxDuration = 300
+
 const MAX_QC_RETRIES = 3
 
 export async function POST(req: NextRequest) {
@@ -58,7 +61,13 @@ export async function POST(req: NextRequest) {
   let totalQcOutputTokens = 0
 
   for (let attempt = 0; attempt < MAX_QC_RETRIES; attempt++) {
-    const story = await generateStory(prefs as Preferences)
+    let story: { title: string; body: string; inputTokens: number; outputTokens: number }
+    try {
+      story = await generateStory(prefs as Preferences)
+    } catch (genErr) {
+      console.error(`[generate-story] Generation attempt ${attempt + 1} failed:`, genErr)
+      continue
+    }
     const qcScore = await scoreStory(story.body, prefs as Preferences)
     totalInputTokens += story.inputTokens
     totalOutputTokens += story.outputTokens

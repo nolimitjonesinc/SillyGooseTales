@@ -31,7 +31,7 @@ function SignupForm() {
 
   const [childName, setChildName] = useState(nameParam)
   const [childAge, setChildAge] = useState<number | null>(null)
-  const [interest, setInterest] = useState('')
+  const [interests, setInterests] = useState<string[]>([])
   const [customInterest, setCustomInterest] = useState('')
   const [toneProfile, setToneProfile] = useState('')
   const [email, setEmail] = useState('')
@@ -46,13 +46,23 @@ function SignupForm() {
     setTimeout(() => setCopied(false), 2500)
   }
 
+  function toggleInterest(val: string) {
+    setInterests(prev => {
+      if (prev.includes(val)) return prev.filter(x => x !== val)
+      if (prev.length >= 3) return prev
+      return [...prev, val]
+    })
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    const finalInterest = interest === 'Something else...' ? customInterest.trim() : interest
+    const finalInterests = interests.map(i =>
+      i === 'Something else...' && customInterest ? customInterest.trim() : i
+    ).filter(i => i !== 'Something else...')
 
     if (!childName.trim()) return setError('What\'s their name?')
     if (!childAge) return setError('Pick an age range.')
-    if (!finalInterest) return setError('What do they love?')
+    if (finalInterests.length === 0) return setError('What do they love?')
     if (!toneProfile) return setError('Pick a story vibe.')
     if (!email.trim()) return setError('Where should the stories land?')
 
@@ -73,7 +83,7 @@ function SignupForm() {
         const res = await fetch('/api/subscribe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ childName: childName.trim(), childAge, interest: finalInterest, toneProfile, email: email.trim() })
+          body: JSON.stringify({ childName: childName.trim(), childAge, interests: finalInterests, toneProfile, email: email.trim() })
         })
         const data = await res.json()
         if (data.success) setDone(true)
@@ -227,17 +237,18 @@ function SignupForm() {
 
           {/* Interests */}
           <div>
-            <label className="block text-sm font-medium text-[#5a5550] mb-3">
+            <label className="block text-sm font-medium text-[#5a5550] mb-1">
               What does {childName || 'your child'} love most?
             </label>
+            <p className="text-xs text-[#aaa] mb-3">Pick up to 3</p>
             <div className="flex flex-wrap gap-2">
               {INTERESTS.map(i => (
-                <button key={i} type="button" onClick={() => setInterest(i)} className={bubble(interest === i)}>
+                <button key={i} type="button" onClick={() => toggleInterest(i)} className={bubble(interests.includes(i))}>
                   {i}
                 </button>
               ))}
             </div>
-            {interest === 'Something else...' && (
+            {interests.includes('Something else...') && (
               <input
                 type="text"
                 value={customInterest}

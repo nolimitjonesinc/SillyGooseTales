@@ -1,18 +1,28 @@
 import { getAnthropic } from './clients'
-import { getToneById, getAgeBandSpec } from './story-tones'
+import { getToneById, getAgeBandSpec, getVoiceSpec } from './story-tones'
 import type { Preferences } from './supabase'
 
 const LAYER_1_IDENTITY = `You are a master children's story author writing a personalized weekly story for a single child. Your stories are age-appropriate, read-aloud optimized, and parent-safe. You NEVER include: violence beyond mild cartoon consequence, adult relationships or romance, imagery designed to frighten, explicit moral lessons stated as dialogue or narration, or anything a school librarian would flag.`
 
-const LAYER_5_CONSTRAINTS = `QUALITY CONSTRAINTS — these override everything above:
+function buildConstraints(age: number): string {
+  // Sentence-variety rule scales with age — demanding 20+ word sentences from a
+  // story meant for a 4-year-old is how toddler stories end up sounding like
+  // literary fiction
+  const sentenceRule = age <= 7
+    ? '- Vary sentence length deliberately: include several sentences under 6 words. Long sentences are forbidden by the VOICE rules above — the VOICE rules win.'
+    : '- Vary sentence length deliberately: include at least one sentence under 6 words and at least one over 20 words.'
+
+  return `QUALITY CONSTRAINTS — these override everything above EXCEPT the VOICE rules:
 - The theme or lesson must NEVER appear as spoken dialogue or narration. Show it through action and consequence only.
 - Every sentence must be readable aloud without the parent stumbling. No passive constructions over 12 words for children under 6.
 - Include at least one concrete sensory detail (something seen, heard, or felt) in each of the three main sections.
 - The child protagonist must drive the solution — adults may assist but the child's idea or courage is the catalyst.
 - The final paragraph must contain a sensory image AND leave the child with warmth or possibility.
 - Antagonists and obstacles must be resolved through empathy or creative thinking, never defeat or punishment.
-- Vary sentence length deliberately: include at least one sentence under 6 words and at least one over 20 words.
-- Do NOT state any theme, lesson, or moral — it must emerge from the plot events only.`
+${sentenceRule}
+- Do NOT state any theme, lesson, or moral — it must emerge from the plot events only.
+- The VOICE rules define the language level for this child's age. If any instruction here or above conflicts with the VOICE rules, follow the VOICE rules.`
+}
 
 function buildStructureDirective(age: number, minWords: number, maxWords: number): string {
   const isYoung = age <= 5
@@ -67,14 +77,15 @@ export async function generateStory(prefs: Preferences): Promise<{ title: string
   const systemPrompt = [
     LAYER_1_IDENTITY,
     tone.system_prompt_snippet,
+    getVoiceSpec(prefs.child_age),
     buildPersonalizationBlock(prefs),
     buildStructureDirective(prefs.child_age, ageBand.min, ageBand.max),
-    LAYER_5_CONSTRAINTS
+    buildConstraints(prefs.child_age)
   ].join('\n\n---\n\n')
 
   const response = await getAnthropic().messages.create({
     model: 'claude-haiku-4-5-20251001',
-    max_tokens: 1800,
+    max_tokens: 2400,
     system: systemPrompt,
     messages: [{ role: 'user', content: 'Write the story now.' }]
   })

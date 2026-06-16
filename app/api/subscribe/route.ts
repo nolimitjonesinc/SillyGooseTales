@@ -2,14 +2,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { generateMagicToken } from '@/lib/magic-tokens'
-import { calculateNextDeliveryAt } from '@/lib/scheduling'
-
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { childName, childAge, interest, toneProfile, email, website } = body
+    const { childName, childAge, interests: interestsInput, interest: interestLegacy, toneProfile, email, website } = body
 
-    if (!childName || !childAge || !interest || !toneProfile || !email) {
+    // Accept either interests[] (new) or interest string (legacy)
+    const incomingInterests: string[] = Array.isArray(interestsInput)
+      ? interestsInput
+      : interestLegacy ? [interestLegacy] : []
+
+    if (!childName || !childAge || incomingInterests.length === 0 || !toneProfile || !email) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
@@ -53,9 +56,9 @@ export async function POST(req: NextRequest) {
       subscriberId = newSub.id
     }
 
-    const timezone = 'America/New_York'
-    const today = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase()
-    const deliveryAt = calculateNextDeliveryAt(timezone, today, 'evening')
+    // Free trial: deliver within 10 minutes. Don't use the scheduled slot — that
+    // puts stories 7 days out if the user signs up after tonight's delivery time.
+    const deliveryAt = new Date(Date.now() + 10 * 60 * 1000)
 
     const { data: existingPrefs } = await supabaseAdmin
       .from('sillytales_preferences')
@@ -64,9 +67,11 @@ export async function POST(req: NextRequest) {
       .single()
 
     const existingInterests: string[] = existingPrefs?.interests ?? []
-    const updatedInterests = existingInterests.includes(interest)
-      ? existingInterests
-      : [...existingInterests, interest]
+    const merged = [...existingInterests]
+    for (const i of incomingInterests) {
+      if (!merged.includes(i)) merged.push(i)
+    }
+    const updatedInterests = merged
 
     const { error: prefError } = await supabaseAdmin
       .from('sillytales_preferences')
@@ -76,9 +81,9 @@ export async function POST(req: NextRequest) {
         child_age: childAge,
         interests: updatedInterests,
         tone_profile: toneProfile,
-        delivery_day: today,
+        delivery_day: 'daily',
         delivery_slot: 'evening',
-        timezone,
+        timezone: 'America/New_York',
         next_delivery_at: deliveryAt.toISOString()
       }, { onConflict: 'subscriber_id' })
 

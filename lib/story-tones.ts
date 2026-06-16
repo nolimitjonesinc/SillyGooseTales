@@ -55,6 +55,7 @@ export const STORY_TONES: StoryTone[] = [
 ]
 
 export const AGE_BAND_SPECS: Record<string, { min: number; max: number; label: string }> = {
+  '2': { min: 200, max: 350, label: '2' },
   '3': { min: 400, max: 550, label: '3-5' },
   '4': { min: 400, max: 550, label: '3-5' },
   '5': { min: 400, max: 550, label: '3-5' },
@@ -63,12 +64,70 @@ export const AGE_BAND_SPECS: Record<string, { min: number; max: number; label: s
   '8': { min: 700, max: 900, label: '6-8' },
   '9': { min: 1100, max: 1400, label: '9-10' },
   '10': { min: 1100, max: 1400, label: '9-10' },
+  '11': { min: 1300, max: 1600, label: '11-12' },
+  '12': { min: 1300, max: 1600, label: '11-12' },
 }
+
+// Age-banded VOICE specs — controls the LANGUAGE of the story, not just the length.
+// Without this, the model defaults to literary prose regardless of the child's age.
+export const VOICE_SPECS: { maxAge: number; spec: string }[] = [
+  {
+    maxAge: 4,
+    spec: `VOICE — write for a toddler listening at bedtime:
+- Sentences are short. Most under 8 words. None over 12 words.
+- Use only words a 3-year-old hears at home or daycare. If a kindergartner would not say it, cut it.
+- Repetition is the engine of the story: pick one key phrase and repeat it at least 3 times so the child can chant along.
+- Sound words are required — at least 3 (BOOM, splish, whoosh, mmmm).
+- Everything must be concrete: things the child can see, touch, eat, or hug. No abstract ideas.
+- Never describe feelings with imagery. Name them plainly (happy, sad, scared) or show them in the body (she stomped her feet, he hid his eyes).
+- No metaphors. Similes only if both sides are everyday toddler objects ("orange like mac and cheese").
+- Strong bouncy read-aloud rhythm with short beats. Do NOT write strict rhyme.
+- One simple problem, solved one simple way. No subplots, no mystery left open.`
+  },
+  {
+    maxAge: 7,
+    spec: `VOICE — write for a kindergartner or early grade-schooler:
+- Sentences mostly under 12 words. A few can stretch longer, but none over 18 words.
+- Vocabulary is everyday spoken language, plus at most 2-3 delicious bigger words whose meaning is obvious from context ("enormous", "ridiculous").
+- Humor comes from silly situations and characters trying their best, not from wordplay.
+- Similes allowed ONLY if both sides are things a 6-year-old knows: "blue like a popsicle" works; "the color of a secret" does not.
+- Never describe emotions with abstract imagery. Name the feeling plainly or show it physically.
+- Use frequent short dialogue that is fun to read aloud in character voices.
+- A repeated phrase or running joke is welcome.
+- The plot stays in one clear storyline a child can retell at breakfast.`
+  },
+  {
+    maxAge: 10,
+    spec: `VOICE — write for a confident independent reader:
+- Richer vocabulary and longer sentences are allowed. Keep paragraphs short and momentum high.
+- Figurative language is allowed in SMALL doses: maximum 2 lyrical images per story, and each must grow out of something concrete in the scene.
+- Wit and cleverness land well — trust the reader to get jokes without explanation.
+- Feelings can be complex and partly unspoken.
+- Something must happen in every paragraph. No paragraph of pure description.`
+  },
+  {
+    maxAge: 12,
+    spec: `VOICE — write for an almost-teen:
+- Use a sharp middle-grade-novel voice: real stakes, dry humor, more interior thought.
+- Never talk down to the reader. No babyish exclamations or sing-song narration.
+- Lyrical prose is welcome where the moment earns it.
+- Dialogue can carry subtext. The reader is smart — let them work a little.`
+  },
+]
 
 export function getToneById(id: string): StoryTone | undefined {
   return STORY_TONES.find(t => t.id === id)
 }
 
 export function getAgeBandSpec(age: number) {
-  return AGE_BAND_SPECS[String(age)] ?? AGE_BAND_SPECS['6']
+  // Clamp out-of-range ages to the nearest defined band instead of silently
+  // defaulting to the middle band
+  const clamped = Math.min(12, Math.max(2, age))
+  return AGE_BAND_SPECS[String(clamped)] ?? AGE_BAND_SPECS['6']
+}
+
+export function getVoiceSpec(age: number): string {
+  const clamped = Math.min(12, Math.max(2, age))
+  const band = VOICE_SPECS.find(v => clamped <= v.maxAge)
+  return band ? band.spec : VOICE_SPECS[VOICE_SPECS.length - 1].spec
 }
