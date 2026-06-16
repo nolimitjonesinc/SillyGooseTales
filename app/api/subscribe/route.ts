@@ -2,6 +2,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { generateMagicToken } from '@/lib/magic-tokens'
+
+export const maxDuration = 300
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
@@ -94,11 +97,15 @@ export async function POST(req: NextRequest) {
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL
     if (appUrl) {
-      fetch(`${appUrl}/api/generate-story`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ subscriberId, overrideDeliveryAt: deliveryAt.toISOString() })
-      }).catch(err => console.error('[subscribe] Background generation failed:', err))
+      try {
+        await fetch(`${appUrl}/api/generate-story`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ subscriberId, overrideDeliveryAt: new Date().toISOString() })
+        })
+      } catch (err) {
+        console.error('[subscribe] Story generation failed:', err)
+      }
     }
 
     const magicToken = await generateMagicToken(subscriberId)
