@@ -60,10 +60,11 @@ export async function POST(req: NextRequest) {
   let totalQcInputTokens = 0
   let totalQcOutputTokens = 0
 
+  let qcFeedback: string | undefined = undefined
   for (let attempt = 0; attempt < MAX_QC_RETRIES; attempt++) {
     let story: { title: string; body: string; inputTokens: number; outputTokens: number }
     try {
-      story = await generateStory(prefs as Preferences)
+      story = await generateStory(prefs as Preferences, qcFeedback)
     } catch (genErr) {
       console.error(`[generate-story] Generation attempt ${attempt + 1} failed:`, genErr)
       continue
@@ -106,6 +107,10 @@ export async function POST(req: NextRequest) {
 
       return NextResponse.json({ success: true, title: story.title })
     }
+
+    // Failed QC — capture why so the next attempt can fix that exact problem
+    qcFeedback = qcScore.failure_notes
+    console.warn(`[generate-story] Attempt ${attempt + 1} failed QC: ${qcScore.failure_notes}`)
   }
 
   // All attempts failed — flag for admin

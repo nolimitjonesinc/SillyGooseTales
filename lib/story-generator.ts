@@ -26,6 +26,9 @@ ${sentenceRule}
 
 function buildStructureDirective(age: number, minWords: number, maxWords: number): string {
   const isYoung = age <= 5
+  // Aim the model at the upper-middle of the band. Left to its own devices it
+  // plays safe and undershoots, landing below the minimum and failing QC.
+  const target = minWords + Math.round((maxWords - minWords) * 0.6)
   return `STORY STRUCTURE — follow this beat-by-beat:
 - HOOK (first 15%): Open mid-action or mid-sensation. Child's name in the first sentence, in action not introduction. World established in one vivid image. Problem or desire introduced before end of section.
 - WANT + OBSTACLE (next 25%): One clear specific want. One emotionally real obstacle — losing something, being left out, something not working. ${isYoung ? 'Keep to one simple scene.' : 'Introduce the recurring character here if applicable.'}
@@ -33,7 +36,7 @@ function buildStructureDirective(age: number, minWords: number, maxWords: number
 - RESOLUTION (next 20%): Child-driven solution — creative and protagonist-led. Tone matches the selected profile exactly.
 - CLOSING IMAGE (final 10%): One sensory moment. The world feels slightly larger and safer. No moral summary. Just the feeling.
 
-WORD COUNT: Write between ${minWords} and ${maxWords} words. This is a hard ceiling — do not exceed ${maxWords} words under any circumstances.
+WORD COUNT: Write between ${minWords} and ${maxWords} words. Aim for about ${target} words. Writing FEWER than ${minWords} words is an automatic failure — the story will be rejected, so err on the longer side. Do not exceed ${maxWords} words.
 Return only the story text with the title on the very first line, then a blank line, then the story. No labels, no commentary.`
 }
 
@@ -64,7 +67,7 @@ The child's stated interest (${interests}) must be load-bearing to the plot — 
 Use the child's name naturally in the first sentence (in action), at the emotional peak, and in the closing image. Maximum 3 appearances total.${excludes}${history}${character}${mood}`
 }
 
-export async function generateStory(prefs: Preferences): Promise<{ title: string; body: string; inputTokens: number; outputTokens: number }> {
+export async function generateStory(prefs: Preferences, feedback?: string): Promise<{ title: string; body: string; inputTokens: number; outputTokens: number }> {
   const toneId = (prefs.tone_profiles?.length)
     ? prefs.tone_profiles[Math.floor(Math.random() * prefs.tone_profiles.length)]
     : prefs.tone_profile
@@ -83,11 +86,17 @@ export async function generateStory(prefs: Preferences): Promise<{ title: string
     buildConstraints(prefs.child_age)
   ].join('\n\n---\n\n')
 
+  // On a retry, tell the model exactly what the quality checker rejected last
+  // time so it corrects that specific problem instead of blindly re-rolling.
+  const userMessage = feedback
+    ? `Your previous attempt was REJECTED by the quality checker for this reason:\n\n"${feedback}"\n\nWrite a brand-new full story that fixes exactly that problem while still following every rule above. Write the story now.`
+    : 'Write the story now.'
+
   const response = await getAnthropic().messages.create({
     model: 'claude-haiku-4-5-20251001',
     max_tokens: 2400,
     system: systemPrompt,
-    messages: [{ role: 'user', content: 'Write the story now.' }]
+    messages: [{ role: 'user', content: userMessage }]
   })
 
   const raw = response.content[0].type === 'text' ? response.content[0].text : ''
