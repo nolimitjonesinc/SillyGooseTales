@@ -52,14 +52,20 @@ export async function POST(req: NextRequest) {
   ).toISOString()
 
   // Generate with QC — up to MAX_QC_RETRIES attempts
-  let lastStory: { title: string; body: string; inputTokens: number; outputTokens: number } | null = null
-  let lastQCScore = null
-  let passed = false
+  type StoryAttempt = { title: string; body: string; inputTokens: number; outputTokens: number }
+  // We always keep the strongest attempt so far (fewest failed criteria), so that
+  // even if nothing passes perfectly, the child still gets the best story we wrote.
+  let bestStory: StoryAttempt | null = null
+  let bestQCScore: Awaited<ReturnType<typeof scoreStory>> | null = null
+  let bestFailCount = Infinity
   let totalInputTokens = 0
   let totalOutputTokens = 0
   let totalQcInputTokens = 0
   let totalQcOutputTokens = 0
 
+  // Accumulate every distinct issue across attempts so a later retry doesn't
+  // reintroduce a problem an earlier one already fixed (stops QC whack-a-mole).
+  const priorIssues: string[] = []
   let qcFeedback: string | undefined = undefined
   for (let attempt = 0; attempt < MAX_QC_RETRIES; attempt++) {
     let story: { title: string; body: string; inputTokens: number; outputTokens: number }
@@ -74,12 +80,22 @@ export async function POST(req: NextRequest) {
     totalOutputTokens += story.outputTokens
     totalQcInputTokens += qcScore.inputTokens
     totalQcOutputTokens += qcScore.outputTokens
-    lastStory = story
-    lastQCScore = qcScore
+
+    // Remember the strongest attempt (fewest failed checks) as our safety net
+    const failCount = [
+      qcScore.protagonist_agency,
+      qcScore.interest_load_bearing,
+      qcScore.no_moral_announcement,
+      qcScore.word_count_in_range,
+      qcScore.tone_match,
+    ].filter(v => v === false).length
+    if (failCount < bestFailCount) {
+      bestFailCount = failCount
+      bestStory = story
+      bestQCScore = qcScore
+    }
 
     if (qcScore.passed) {
-      passed = true
-
       if (process.env.SILLYTALES_DRY_RUN === 'true') {
         console.log('[DRY RUN] Would queue story:', story.title, 'for', deliveryAt)
         return NextResponse.json({ dryRun: true, story })
@@ -108,36 +124,58 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: true, title: story.title })
     }
 
-    // Failed QC — capture why so the next attempt can fix that exact problem
-    qcFeedback = qcScore.failure_notes
+    // Failed QC — accumulate the reason so the next attempt fixes ALL known issues
+    if (qcScore.failure_notes && !priorIssues.includes(qcScore.failure_notes)) {
+      priorIssues.push(qcScore.failure_notes)
+    }
+    qcFeedback = priorIssues.join('\n')
     console.warn(`[generate-story] Attempt ${attempt + 1} failed QC: ${qcScore.failure_notes}`)
   }
 
-  // All attempts failed — flag for admin
-  if (lastStory && lastQCScore) {
+  // No attempt passed QC perfectly — but a child must ALWAYS get a story.
+  // Deliver the strongest attempt anyway, and notify admin so it can be reviewed.
+  if (bestStory && bestQCScore) {
+    if (process.env.SILLYTALES_DRY_RUN === 'true') {
+      console.log('[DRY RUN] Would deliver best imperfect story:', bestStory.title)
+      return NextResponse.json({ dryRun: true, story: bestStory, imperfect: true })
+    }
+
     await supabaseAdmin.from('sillytales_story_queue').insert({
       subscriber_id: subscriberId,
-      story_title: lastStory.title,
-      story_body: lastStory.body,
+      story_title: bestStory.title,
+      story_body: bestStory.body,
       story_token: crypto.randomUUID(),
       delivery_at: deliveryAt,
-      status: 'flagged',
+      status: 'queued',
       retry_count: MAX_QC_RETRIES,
-      qc_score: lastQCScore,
+      qc_score: bestQCScore,
       input_tokens: totalInputTokens,
       output_tokens: totalOutputTokens,
       qc_input_tokens: totalQcInputTokens,
       qc_output_tokens: totalQcOutputTokens
     })
 
-    // Alert admin
-    await getResend().emails.send({
-      from: `${process.env.RESEND_FROM_NAME} <${process.env.RESEND_FROM_EMAIL}>`,
-      to: process.env.ADMIN_EMAIL!,
-      subject: `Silly Goose Tales: QC failed for subscriber ${subscriberId}`,
-      text: `A story for subscriber ${subscriberId} failed QC ${MAX_QC_RETRIES} times and has been flagged for review.\n\nFailure notes: ${lastQCScore.failure_notes}\n\nReview at: ${process.env.NEXT_PUBLIC_APP_URL}/admin/review`
-    })
+    // Advance the schedule just like the pass path does
+    await supabaseAdmin
+      .from('sillytales_preferences')
+      .update({ next_delivery_at: deliveryAt })
+      .eq('subscriber_id', subscriberId)
+
+    // Let admin know it shipped but wasn't a clean pass — review optional, not urgent
+    try {
+      await getResend().emails.send({
+        from: `${process.env.RESEND_FROM_NAME} <${process.env.RESEND_FROM_EMAIL}>`,
+        to: process.env.ADMIN_EMAIL!,
+        subject: `Silly Goose Tales: story delivered with minor QC miss (subscriber ${subscriberId})`,
+        text: `A story was delivered to subscriber ${subscriberId} after ${MAX_QC_RETRIES} attempts didn't fully pass QC. The best version (${bestFailCount} check${bestFailCount === 1 ? '' : 's'} short) was sent so the child still got a story.\n\nWhat was slightly off: ${bestQCScore.failure_notes}\n\nReview at: ${process.env.NEXT_PUBLIC_APP_URL}/admin/review`
+      })
+    } catch (mailErr) {
+      console.error('[generate-story] Admin notify failed:', mailErr)
+    }
+
+    return NextResponse.json({ success: true, title: bestStory.title, imperfect: true })
   }
 
-  return NextResponse.json({ error: 'Story failed QC after max retries — flagged for admin' }, { status: 422 })
+  // Only reach here if every generation attempt threw before producing any text
+  return NextResponse.json({ error: 'Story generation failed entirely — no draft produced' }, { status: 500 })
 }

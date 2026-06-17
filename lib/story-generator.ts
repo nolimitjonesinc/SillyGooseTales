@@ -21,7 +21,14 @@ function buildConstraints(age: number): string {
 - Antagonists and obstacles must be resolved through empathy or creative thinking, never defeat or punishment.
 ${sentenceRule}
 - Do NOT state any theme, lesson, or moral — it must emerge from the plot events only.
-- The VOICE rules define the language level for this child's age. If any instruction here or above conflicts with the VOICE rules, follow the VOICE rules.`
+- The VOICE rules define the language level for this child's age. If any instruction here or above conflicts with the VOICE rules, follow the VOICE rules.
+
+GRADING — your story will be automatically checked against these 5 rules and rejected if it misses ANY. Get them all right the first time:
+1. The CHILD solves the problem with their own idea or courage — not an adult, not magic, not luck.
+2. The child's stated interest is the KEY to solving the problem, not just background decoration.
+3. NO stated lesson. The story must never explain its own point. This is the rule most stories fail — do not end by telling the reader what was learned or why it mattered. BANNED final lines like: "He was helping." / "And that made her brave." / "She learned she was stronger than she thought." / "It felt good to be kind." End on a SENSORY IMAGE or a feeling shown through action — never a summary of the meaning.
+4. Length: stay within the required word count. Coming in UNDER the minimum is an automatic rejection — write to the target, lean long.
+5. The ending's feeling must match the chosen tone exactly.`
 }
 
 function buildStructureDirective(age: number, minWords: number, maxWords: number): string {

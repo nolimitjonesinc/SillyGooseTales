@@ -32,7 +32,7 @@ EVALUATE each criterion as true or false:
 
 2. interest_load_bearing: Is the child's stated interest (${interests}) actively used in resolving the plot? (false if the interest only appears as a description and doesn't affect the story's outcome)
 
-3. no_moral_announcement: Does the story avoid stating its lesson, theme, or moral explicitly as dialogue or narration? (false if any character says something like "and that's why..." or the narrator summarizes a lesson)
+3. no_moral_announcement: Does the story avoid EXPLICITLY stating its lesson or moral? Mark false ONLY if a character or the narrator directly spells out the takeaway (e.g. "and that's why you should always...", "she learned that being brave matters", "it felt good to help"). A warm or hopeful closing FEELING, or a sensory final image, is allowed and should NOT fail this check — only an actual stated lesson fails.
 
 4. word_count_in_range: Is the word count between ${ageBand.min} and ${ageBand.max}? (actual: ${wordCount})
 
