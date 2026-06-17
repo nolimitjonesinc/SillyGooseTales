@@ -8,7 +8,7 @@ import type { Preferences } from '@/lib/supabase'
 
 export const maxDuration = 300
 
-const MAX_QC_RETRIES = 3
+const MAX_QC_RETRIES = 5
 
 export async function POST(req: NextRequest) {
   const { subscriberId, overrideDeliveryAt } = await req.json()

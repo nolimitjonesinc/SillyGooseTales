@@ -1,5 +1,5 @@
 // Free tier signup — no credit card, no account, story arrives tonight
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse, after } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { generateMagicToken } from '@/lib/magic-tokens'
 
@@ -95,20 +95,25 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Failed to save preferences' }, { status: 500 })
     }
 
+    const magicToken = await generateMagicToken(subscriberId)
+
+    // Kick off story generation in the background so the signup response returns
+    // immediately. The story is delivered by the deliver-stories cron within minutes,
+    // so the user never needs to wait on the AI write here.
     const appUrl = process.env.NEXT_PUBLIC_APP_URL
     if (appUrl) {
-      try {
-        await fetch(`${appUrl}/api/generate-story`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ subscriberId, overrideDeliveryAt: new Date().toISOString() })
-        })
-      } catch (err) {
-        console.error('[subscribe] Story generation failed:', err)
-      }
+      after(async () => {
+        try {
+          await fetch(`${appUrl}/api/generate-story`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ subscriberId, overrideDeliveryAt: new Date().toISOString() })
+          })
+        } catch (err) {
+          console.error('[subscribe] Story generation failed:', err)
+        }
+      })
     }
-
-    const magicToken = await generateMagicToken(subscriberId)
 
     return NextResponse.json({
       success: true,
