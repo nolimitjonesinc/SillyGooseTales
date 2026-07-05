@@ -128,3 +128,52 @@
     @apply font-sans;
   }
 }
+
+/* Blog content styling */
+.blog-content p {
+  margin-bottom: 1.5rem;
+}
+
+.blog-content h2 {
+  font-size: 1.875rem;
+  font-weight: bold;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  color: #2C2A26;
+}
+
+.blog-content h3 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  color: #2C2A26;
+}
+
+.blog-content a {
+  color: #E8A838;
+  text-decoration: underline;
+}
+
+.blog-content a:hover {
+  color: #d4952d;
+}
+
+.blog-content strong {
+  font-weight: bold;
+  color: #2C2A26;
+}
+
+.blog-content em {
+  font-style: italic;
+}
+
+.blog-content ul,
+.blog-content ol {
+  margin-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.blog-content li {
+  margin-bottom: 0.5rem;
+}
