@@ -1,5 +1,5 @@
 # Silly Goose Tales — Status
-_Auto-updated by Status Brain on every push. Last change: Add Status Brain workflow to auto-document project state._
+_Auto-updated by Status Brain on every push. Last change: Add Status Brain workflow to auto-document project state on every push._
 
 **Status:** Live  
 **What it is:** A Next.js app that generates and emails personalized AI bedtime stories to subscribers on a schedule they choose.  
@@ -27,7 +27,7 @@ _Auto-updated by Status Brain on every push. Last change: Add Status Brain workf
 - 2026-06-16 — Speed up signup flow and increase QC retries to 5; fix checkout crash on story page
 - 2026-06-10 — Add privacy/terms pages, footer links, upgrade to Claude Haiku 4.5
 - 2026-06-07 — Complete admin dashboard: revenue panel, subscriber table, pipeline timing, flagged story management
-- 2026-06-04 — Fix QC crashes and orphaned state calls; ship accumulated stability fixes
+- 2026-06-05 — Fix receipt email link going to homepage instead of looping back to onboarding
 
 ## Reusable parts (for other projects)
 - **Status Brain** — Auto-generated project status from git history and code inspection — `.github/workflows/status-brain.yml`, `status-brain.mjs`
